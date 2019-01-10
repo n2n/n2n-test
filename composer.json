@@ -4,7 +4,8 @@
 	"description" : "n2n test utils",
 	"keywords" : [
 		"n2n",
-		"test"
+		"test",
+		"utils"
 	],
 	"homepage" : "http://n2n.rocks/",
 	"license" : "LGPL-3.0-or-later",
