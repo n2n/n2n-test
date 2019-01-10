@@ -21,7 +21,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"n2n\\reflection\\" : "src/app/n2n/reflection"
+			"n2n\\test\\" : "src/app/n2n/test"
 		}
 	}
 }
