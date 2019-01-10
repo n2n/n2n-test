@@ -57,13 +57,15 @@ class DbTestEnv {
 	 * @return DbTestEnv
 	 */
 	public function truncate(string $persistenceUnitName = null) {
-		$db = $this->pdo($persistenceUnitName)->getMetaData()->getDatabase();
+		$pdo = $this->pdo($persistenceUnitName);
+		$metaData = $pdo->getMetaData();
+		$db = $metaData->getDatabase();
 		
 		foreach ($db->getMetaEntities() as $metaEntity) {
-			$db->removeMetaEntityByName($metaEntity->getName());
+			$delStmtBuilder = $metaData->createDeleteStatementBuilder();
+			$delStmtBuilder->setTable($metaEntity->getName());
+			$pdo->exec($delStmtBuilder->toSqlString());
 		}
-	
-		$db->flush();
 		
 		return $this;
 	}
