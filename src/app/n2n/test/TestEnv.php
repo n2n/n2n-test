@@ -28,6 +28,22 @@ class TestEnv {
 	
 	/**
 	 * @param N2nContext $n2nContext
+	 * @return \n2n\test\ContainerTestEnv
+	 */
+	public static function container(N2nContext $n2nContext = null) {
+		return new ContainerTestEnv($n2nContext ?? N2N::getN2nContext());
+	}
+	
+	/**
+	 * @param N2nContext $n2nContext
+	 * @return \n2n\test\OrmTestEnv
+	 */
+	public static function orm(N2nContext $n2nContext = null) {
+		return new OrmTestEnv($n2nContext ?? N2N::getN2nContext());
+	}
+	
+	/**
+	 * @param N2nContext $n2nContext
 	 * @return DbTestEnv
 	 */
 	public static function db(N2nContext $n2nContext = null) {
