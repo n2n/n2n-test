@@ -25,8 +25,6 @@ namespace n2n\test;
 use n2n\core\container\N2nContext;
 use n2n\core\container\PdoPool;
 use n2n\util\type\CastUtils;
-use Prophecy\Util\StringUtil;
-use n2n\util\StringUtils;
 
 class DbTestEnv {
 	/**

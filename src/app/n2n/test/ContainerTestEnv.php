@@ -23,12 +23,6 @@ namespace n2n\test;
 
 
 use n2n\core\container\N2nContext;
-use n2n\core\container\PdoPool;
-use n2n\util\type\CastUtils;
-use Prophecy\Util\StringUtil;
-use n2n\util\StringUtils;
-use n2n\persistence\orm\EntityManager;
-use n2n\persistence\orm\EntityManagerFactory;
 use n2n\core\container\TransactionManager;
 
 class ContainerTestEnv {
@@ -46,7 +40,7 @@ class ContainerTestEnv {
 	
 	/**
 	 * Alias for
-	 * @see OrgTestEnv::getTransactionManager()
+	 * @see OrmTestEnv::getTransactionManager()
 	 */
 	public function tm() {
 		return $this->getTransactionManager();
