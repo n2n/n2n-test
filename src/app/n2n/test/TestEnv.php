@@ -58,4 +58,31 @@ class TestEnv {
 	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null) {
 		return self::container($n2nContext)->tm()->createTransaction($readOnly);
 	}
+	
+	/**
+	 * @param string|\ReflectionClass $id
+	 * @param N2nContext $n2nContext
+	 * @return object
+	 */
+	public static function lookup($id, N2nContext $n2nContext = null) {
+		return self::container()->lookup($id);
+	}
+	
+	/**
+	 * @param string $persistenceUnitName
+	 * @param N2nContext $n2nContext
+	 * @return \n2n\persistence\orm\EntityManager
+	 */
+	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
+		return self::orm()->em(false, $persistenceUnitName);
+	}
+	
+	/**
+	 * @param string $persistenceUnitName
+	 * @param N2nContext $n2nContext
+	 * @return \n2n\persistence\orm\EntityManager
+	 */
+	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
+		return self::orm()->em(true, $persistenceUnitName);
+	}
 }
