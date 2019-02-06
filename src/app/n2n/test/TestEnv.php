@@ -49,4 +49,13 @@ class TestEnv {
 	public static function db(N2nContext $n2nContext = null) {
 		return new DbTestEnv($n2nContext ?? N2N::getN2nContext());
 	}
+	
+	/**
+	 * @param bool $readOnly
+	 * @param N2nContext $n2nContext
+	 * @return \n2n\core\container\Transaction
+	 */
+	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null) {
+		return self::container($n2nContext)->tm()->createTransaction($readOnly);
+	}
 }

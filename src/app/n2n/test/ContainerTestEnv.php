@@ -52,4 +52,12 @@ class ContainerTestEnv {
 	public function getTransactionManager() {
 		return $this->n2nContext->lookup(TransactionManager::class);
 	}
+	
+	/**
+	 * @param string|ReflectionClass $id
+	 * @return object
+	 */
+	public function lookup($id) {
+		return $this->n2nContext->lookup($id);
+	}
 }
