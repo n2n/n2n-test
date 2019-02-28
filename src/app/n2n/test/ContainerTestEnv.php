@@ -54,7 +54,7 @@ class ContainerTestEnv {
 	}
 	
 	/**
-	 * @param string|ReflectionClass $id
+	 * @param string|\ReflectionClass $id
 	 * @return object
 	 */
 	public function lookup($id) {
