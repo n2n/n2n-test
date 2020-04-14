@@ -36,7 +36,7 @@ class TestEnv {
 	
 	/**
 	 * @param N2nContext $n2nContext
-	 * @return \n2n\test\ContainerTestEnv
+	 * @return \n2n\test\HttpTestEnv
 	 */
 	public static function http(N2nContext $n2nContext = null) {
 		return new HttpTestEnv($n2nContext ?? N2N::getN2nContext());

@@ -32,6 +32,12 @@ use n2n\web\http\controller\ControllerRegistry;
 use n2n\core\container\impl\AppN2nContext;
 use n2n\web\http\Response;
 use n2n\util\StringUtils;
+use n2n\core\container\N2nContext;
+use n2n\core\config\AppConfig;
+use n2n\core\config\WebConfig;
+use n2n\util\type\CastUtils;
+use n2n\web\http\SimpleSession;
+use n2n\core\container\PdoPool;
 
 class HttpTestEnv {
 	
@@ -52,13 +58,23 @@ class HttpTestEnv {
 	 * @param Url $contextUrl
 	 * @return TestRequest
 	 */
-	function newRequest(string $subsystem = null, Url $contextUrl) {
+	function newRequest($subsystemName = null, Url $contextUrl = null) {
+		if ($contextUrl === null) {
+			$contextUrl = Url::create('https://www.test-url.ch/');
+		}
+		
 		$request = new SimpleRequest($contextUrl);
 	
-		$appN2nContext = AppN2nContext::createCopy($this->httpContext->getN2nContext());
-		$appN2nContext->setHttpContext(HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, $appN2nContext));
+		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
+		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext);
+		$appN2nContext->setHttpContext($httpContext);
 		
-		return new TestRequest($appN2nContext);
+		$pdoPool = $appN2nContext->lookup(PdoPool::class);
+		foreach ($this->n2nContext->lookup(PdoPool::class)->getInitializedPdos() as $puName => $pdo) {
+			$pdoPool->setPdo($puName, $pdo);
+		}
+		
+		return new TestRequest($httpContext, $request);
 	}
 }
 
@@ -120,12 +136,30 @@ class TestRequest {
 	}
 	
 	/**
+	 * @param string $name
+	 * @param string $value
+	 * @return \n2n\test\TestRequest
+	 */
+	function header(string $name, string $value) {
+		$this->simpleRequest->setHeader($name, $value);
+		return $this;
+	}
+	
+	/**
 	 * @param string|null $body
 	 * @return \n2n\test\TestRequest
 	 */
 	function body(?string $body) {
 		$this->simpleRequest->setBody($body);
 		return $this;
+	}
+	
+	/**
+	 * @param array $data
+	 * @return \n2n\test\TestRequest
+	 */
+	function bodyJson(array $data) {
+		return $this->body(StringUtils::jsonEncode($data));
 	}
 	
 	/**
@@ -137,8 +171,9 @@ class TestRequest {
 		$controllerRegistry
 				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName())
 				->execute();
-		
-		return new TestRespone($this->httpContext->getResponse());
+		$response = $this->httpContext->getResponse();
+		$response->closeBuffer();
+		return new TestResponse($response);
 	}	
 }
 
