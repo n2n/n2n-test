@@ -1,0 +1,166 @@
+<?php
+/*
+ * Copyright (c) 2012-2016, Hofmänner New Media.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This file is part of the N2N FRAMEWORK.
+ *
+ * The N2N FRAMEWORK is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * N2N is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details: http://www.gnu.org/licenses/
+ *
+ * The following people participated in this project:
+ *
+ * Andreas von Burg.....: Architect, Lead Developer
+ * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
+ * Thomas Günther.......: Developer, Hangar
+ */
+namespace n2n\test;
+
+use n2n\web\http\HttpContext;
+use n2n\core\HttpContextFactory;
+use n2n\web\http\SimpleRequest;
+use n2n\core\N2N;
+use n2n\util\uri\Query;
+use n2n\web\http\Method;
+use n2n\util\uri\Url;
+use n2n\web\http\controller\ControllerRegistry;
+use n2n\core\container\impl\AppN2nContext;
+use n2n\web\http\Response;
+use n2n\util\StringUtils;
+
+class HttpTestEnv {
+	
+	/**
+	 * @var N2nContext
+	 */
+	private $n2nContext;
+	
+	/**
+	 * @param N2nContext $n2nContext
+	 */
+	function __construct(N2nContext $n2nContext) {
+		$this->n2nContext = $n2nContext;
+	}
+	
+	/**
+	 * @param string $subsystem
+	 * @param Url $contextUrl
+	 * @return TestRequest
+	 */
+	function newRequest(string $subsystem = null, Url $contextUrl) {
+		$request = new SimpleRequest($contextUrl);
+	
+		$appN2nContext = AppN2nContext::createCopy($this->httpContext->getN2nContext());
+		$appN2nContext->setHttpContext(HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, $appN2nContext));
+		
+		return new TestRequest($appN2nContext);
+	}
+}
+
+class TestRequest {
+	/**
+	 * @var HttpContext
+	 */
+	private $httpContext;
+	/**
+	 * @var SimpleRequest
+	 */
+	private $simpleRequest;
+	
+	/**
+	 * @param HttpContext $httpContext
+	 */
+	function __construct(HttpContext $httpContext, SimpleRequest $simpleRequest) {
+		$this->httpContext = $httpContext;
+		$this->simpleRequest = $simpleRequest;
+	}
+	
+	/**
+	 * @param string $name
+	 * @return \n2n\test\TestRequest
+	 */
+	function subsystem(?string $name) {
+		if ($name === null) {
+			$this->simpleRequest->setSubsystem(null);
+			return $this;
+		}
+		
+		$this->simpleRequest->setSubsystem($this->httpContext->getAvailableSubsystemByName($name));
+		return $this;
+	}
+	
+	/**
+	 * @return \n2n\test\TestRequest
+	 */
+	function get($cmdUrl) {
+		$this->simpleRequest->setMethod(Method::GET);
+		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
+		return $this;
+	}
+	
+	/**
+	 * @param mixed $cmdUrl will be passed to {@see Url::create()} for creation
+	 * @param mixed $postQuery will be passed to {@see Query::create()} for creation
+	 * @return \n2n\test\TestRequest
+	 */
+	function post($cmdUrl, $postQuery = null) {
+		$this->simpleRequest->setMethod(Method::POST);
+		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
+		
+		if ($postQuery !== null) {
+			$this->simpleRequest->setPostQuery(Query::create($postQuery));
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * @param string|null $body
+	 * @return \n2n\test\TestRequest
+	 */
+	function body(?string $body) {
+		$this->simpleRequest->setBody($body);
+		return $this;
+	}
+	
+	/**
+	 * @return \n2n\test\TestRequest
+	 */
+	function exec() {
+		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
+		
+		$controllerRegistry
+				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName())
+				->execute();
+		
+		return new TestRespone($this->httpContext->getResponse());
+	}	
+}
+
+class TestResponse {
+	private $response;
+	
+	function __construct(Response $response) {
+		$this->response = $response;
+	}
+	
+	/**
+	 * @return array
+	 */
+	function parseJson() {
+		return StringUtils::jsonDecode($this->getContents(), true);
+	}
+		
+	/**
+	 * @return string
+	 */
+	function getContents() {
+		return $this->response->getSentPayload()->getBufferedContents();
+	}
+}
+

@@ -36,6 +36,14 @@ class TestEnv {
 	
 	/**
 	 * @param N2nContext $n2nContext
+	 * @return \n2n\test\ContainerTestEnv
+	 */
+	public static function http(N2nContext $n2nContext = null) {
+		return new HttpTestEnv($n2nContext ?? N2N::getN2nContext());
+	}
+	
+	/**
+	 * @param N2nContext $n2nContext
 	 * @return \n2n\test\OrmTestEnv
 	 */
 	public static function orm(N2nContext $n2nContext = null) {
