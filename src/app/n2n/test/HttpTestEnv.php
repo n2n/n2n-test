@@ -64,6 +64,7 @@ class HttpTestEnv {
 		}
 		
 		$request = new SimpleRequest($contextUrl);
+		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 	
 		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
 		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext);
