@@ -65,10 +65,14 @@ class HttpTestEnv {
 		
 		$request = new SimpleRequest($contextUrl);
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
-	
+		
 		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
 		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext);
 		$appN2nContext->setHttpContext($httpContext);
+		
+		if ($subsystemName !== null) {
+			$request->setSubsystem($httpContext->getAvailableSubsystemByName($subsystemName));
+		}
 		
 		$pdoPool = $appN2nContext->lookup(PdoPool::class);
 		foreach ($this->n2nContext->lookup(PdoPool::class)->getInitializedPdos() as $puName => $pdo) {
