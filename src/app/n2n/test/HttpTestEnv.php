@@ -125,6 +125,24 @@ class TestRequest {
 	}
 	
 	/**
+	 * @return \n2n\test\TestRequest
+	 */
+	function put($cmdUrl) {
+		$this->simpleRequest->setMethod(Method::PUT);
+		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
+		return $this;
+	}
+	
+	/**
+	 * @return \n2n\test\TestRequest
+	 */
+	function delete($cmdUrl) {
+		$this->simpleRequest->setMethod(Method::DELETE);
+		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
+		return $this;
+	}
+	
+	/**
 	 * @param mixed $cmdUrl will be passed to {@see Url::create()} for creation
 	 * @param mixed $postQuery will be passed to {@see Query::create()} for creation
 	 * @return \n2n\test\TestRequest
