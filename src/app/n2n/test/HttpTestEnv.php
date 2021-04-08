@@ -38,6 +38,9 @@ use n2n\core\config\WebConfig;
 use n2n\util\type\CastUtils;
 use n2n\web\http\SimpleSession;
 use n2n\core\container\PdoPool;
+use n2n\web\http\UploadDefinition;
+use n2n\util\type\ArgUtils;
+use n2n\io\fs\FsPath;
 
 class HttpTestEnv {
 	
@@ -80,6 +83,14 @@ class HttpTestEnv {
 		}
 		
 		return new TestRequest($httpContext, $request);
+	}
+	
+	/**
+	 * @param FsPath $fsPath
+	 * @return UploadDefinition
+	 */
+	function newUploadDefinitionFromFsPath(FsPath $fsPath) {
+		
 	}
 }
 
@@ -183,6 +194,15 @@ class TestRequest {
 	 */
 	function bodyJson(array $data) {
 		return $this->body(StringUtils::jsonEncode($data));
+	}
+	
+	/**
+	 * @param UploadDefinition[] $uploadDefinitions
+	 * @return \n2n\test\TestRequest
+	 */
+	function uploadDefinitions(array $uploadDefinitions) {
+		$this->simpleRequest->setUploadDefinitions($uploadDefinitions);
+		return $this;
 	}
 	
 	/**
