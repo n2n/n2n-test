@@ -41,6 +41,8 @@ use n2n\core\container\PdoPool;
 use n2n\web\http\UploadDefinition;
 use n2n\util\type\ArgUtils;
 use n2n\io\fs\FsPath;
+use n2n\io\managed\FileSource;
+use n2n\io\managed\impl\FsFileSource;
 
 class HttpTestEnv {
 	
@@ -90,7 +92,8 @@ class HttpTestEnv {
 	 * @return UploadDefinition
 	 */
 	function newUploadDefinitionFromFsPath(FsPath $fsPath) {
-		
+		return new UploadDefinition(UPLOAD_ERR_OK, $fsPath->getName(), (string) $fsPath, 
+				mime_content_type((string) $fsPath), $fsPath->getSize());
 	}
 }
 
