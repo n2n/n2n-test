@@ -43,6 +43,7 @@ use n2n\util\type\ArgUtils;
 use n2n\io\fs\FsPath;
 use n2n\io\managed\FileSource;
 use n2n\io\managed\impl\FsFileSource;
+use n2n\io\IoUtils;
 
 class HttpTestEnv {
 	
@@ -92,7 +93,10 @@ class HttpTestEnv {
 	 * @return UploadDefinition
 	 */
 	function newUploadDefinitionFromFsPath(FsPath $fsPath) {
-		return new UploadDefinition(UPLOAD_ERR_OK, $fsPath->getName(), (string) $fsPath, 
+		$tmpFile = tempnam(sys_get_temp_dir(), 'n2n-test');
+		IoUtils::putContents($tmpFile, IoUtils::getContents((string) $fsPath));
+		
+		return new UploadDefinition(UPLOAD_ERR_OK, $fsPath->getName(), $tmpFile,
 				mime_content_type((string) $fsPath), $fsPath->getSize());
 	}
 }
