@@ -213,7 +213,7 @@ class TestRequest {
 	}
 	
 	/**
-	 * @return \n2n\test\TestRequest
+	 * @return TestResponse
 	 */
 	function exec() {
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
