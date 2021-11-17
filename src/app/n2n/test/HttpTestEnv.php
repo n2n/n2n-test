@@ -40,10 +40,10 @@ use n2n\web\http\SimpleSession;
 use n2n\core\container\PdoPool;
 use n2n\web\http\UploadDefinition;
 use n2n\util\type\ArgUtils;
-use n2n\io\fs\FsPath;
+use n2n\util\io\fs\FsPath;
 use n2n\io\managed\FileSource;
 use n2n\io\managed\impl\FsFileSource;
-use n2n\io\IoUtils;
+use n2n\util\io\IoUtils;
 
 class HttpTestEnv {
 	
