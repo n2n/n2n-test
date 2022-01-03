@@ -73,9 +73,8 @@ class HttpTestEnv {
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 		
 		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
-		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext);
+		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext, null);
 		$appN2nContext->setHttpContext($httpContext);
-		
 		if ($subsystemName !== null) {
 			$request->setSubsystem($httpContext->getAvailableSubsystemByName($subsystemName));
 		}
@@ -216,6 +215,9 @@ class TestRequest {
 	 * @return TestResponse
 	 */
 	function exec() {
+		/**
+		 * @var ControllerRegistry $controllerRegistry
+		 */
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 		
 		$controllerRegistry
@@ -224,7 +226,7 @@ class TestRequest {
 		$response = $this->httpContext->getResponse();
 		$response->closeBuffer();
 		return new TestResponse($response);
-	}	
+	}
 }
 
 class TestResponse {
@@ -255,4 +257,3 @@ class TestResponse {
 		return $this->response->getStatus();
 	}
 }
-
