@@ -247,5 +247,12 @@ class TestResponse {
 	function getContents() {
 		return $this->response->getSentPayload()->getBufferedContents();
 	}
+
+	/**
+	 * @return int
+	 */
+	function getStatus() {
+		return $this->response->getStatus();
+	}
 }
 
