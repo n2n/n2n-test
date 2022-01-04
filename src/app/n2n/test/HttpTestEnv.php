@@ -220,9 +220,14 @@ class TestRequest {
 		 */
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 		
-		$controllerRegistry
+		$result = $controllerRegistry
 				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName())
 				->execute();
+
+		if (!$result->isSuccessful()) {
+			throw $result->getStatusException();
+		}
+
 		$response = $this->httpContext->getResponse();
 		$response->closeBuffer();
 		return new TestResponse($response);
