@@ -214,18 +214,22 @@ class TestRequest {
 	/**
 	 * @return TestResponse
 	 */
-	function exec() {
+	function exec(bool $sendStatusView = false) {
 		/**
 		 * @var ControllerRegistry $controllerRegistry
 		 */
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 		
-		$result = $controllerRegistry
-				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName())
-				->execute();
+		$controllingPlan = $controllerRegistry
+				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName());
+		$result = $controllingPlan->execute();
 
 		if (!$result->isSuccessful()) {
-			throw $result->getStatusException();
+			if (!$sendStatusView) {
+				throw $result->getStatusException();
+			}
+
+			$controllingPlan->sendStatusView($result->getStatusException());
 		}
 
 		$response = $this->httpContext->getResponse();
