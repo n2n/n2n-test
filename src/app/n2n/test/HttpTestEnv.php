@@ -44,6 +44,7 @@ use n2n\util\io\fs\FsPath;
 use n2n\io\managed\FileSource;
 use n2n\io\managed\impl\FsFileSource;
 use n2n\util\io\IoUtils;
+use n2n\reflection\magic\MagicMethodInvoker;
 
 class HttpTestEnv {
 	
@@ -58,7 +59,7 @@ class HttpTestEnv {
 	function __construct(N2nContext $n2nContext) {
 		$this->n2nContext = $n2nContext;
 	}
-	
+
 	/**
 	 * @param string $subsystem
 	 * @param Url $contextUrl
@@ -73,10 +74,12 @@ class HttpTestEnv {
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 		
 		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
-		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(), $appN2nContext, null);
+		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(),$appN2nContext, null);
+		
+		
 		$appN2nContext->setHttpContext($httpContext);
 		if ($subsystemName !== null) {
-			$request->setSubsystem($httpContext->getAvailableSubsystemByName($subsystemName));
+			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
 		}
 		
 		$pdoPool = $appN2nContext->lookup(PdoPool::class);
@@ -108,7 +111,7 @@ class TestRequest {
 	/**
 	 * @var SimpleRequest
 	 */
-	private $simpleRequest;
+	private SimpleRequest $simpleRequest;
 	
 	/**
 	 * @param HttpContext $httpContext
@@ -117,18 +120,29 @@ class TestRequest {
 		$this->httpContext = $httpContext;
 		$this->simpleRequest = $simpleRequest;
 	}
-	
+
+	/**
+	 * @param \Closure $closure
+	 * @return $this
+	 * @throws \ReflectionException
+	 */
+	function inject(\Closure $closure) {
+		$invoker = new MagicMethodInvoker($this->httpContext->getN2nContext());
+		$invoker->invoke(null, new \ReflectionFunction($closure));
+		return $this;
+	}
+
 	/**
 	 * @param string $name
 	 * @return \n2n\test\TestRequest
 	 */
 	function subsystem(?string $name) {
 		if ($name === null) {
-			$this->simpleRequest->setSubsystem(null);
+			$this->httpContext->setActiveSubsystemRule(null);
 			return $this;
 		}
-		
-		$this->simpleRequest->setSubsystem($this->httpContext->getAvailableSubsystemByName($name));
+
+		$this->httpContext->setActiveSubsystemRule($this->httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($name));
 		return $this;
 	}
 	
@@ -221,7 +235,7 @@ class TestRequest {
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 		
 		$controllingPlan = $controllerRegistry
-				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->simpleRequest->getSubsystemName());
+				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->httpContext->getActiveSubsystemRule());
 		$result = $controllingPlan->execute();
 
 		if (!$result->isSuccessful()) {
