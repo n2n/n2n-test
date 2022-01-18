@@ -132,6 +132,16 @@ class TestRequest {
 		return $this;
 	}
 
+	function putLookupInjection(string $className, object $obj) {
+		$this->httpContext->getN2nContext()->putLookupInjection($className, $obj);
+		return $this;
+	}
+
+	function removeLookupInjection(string $className) {
+		$this->httpContext->getN2nContext()->removeLookupInjection($className);
+		return $this;
+	}
+	
 	/**
 	 * @param string $name
 	 * @return \n2n\test\TestRequest
