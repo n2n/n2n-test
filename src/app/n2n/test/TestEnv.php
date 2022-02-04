@@ -70,7 +70,7 @@ class TestEnv {
 	/**
 	 * @param string|\ReflectionClass $id
 	 * @param N2nContext $n2nContext
-	 * @return object
+	 * @return mixed
 	 */
 	public static function lookup($id, N2nContext $n2nContext = null) {
 		return self::container()->lookup($id);
