@@ -82,10 +82,10 @@ class HttpTestEnv {
 			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
 		}
 		
-		$pdoPool = $appN2nContext->lookup(PdoPool::class);
-		foreach ($this->n2nContext->lookup(PdoPool::class)->getInitializedPdos() as $puName => $pdo) {
-			$pdoPool->setPdo($puName, $pdo);
-		}
+//		$pdoPool = $appN2nContext->lookup(PdoPool::class);
+//		foreach ($this->n2nContext->lookup(PdoPool::class)->getInitializedPdos() as $puName => $pdo) {
+//			$pdoPool->setPdo($puName, $pdo);
+//		}
 		
 		return new TestRequest($httpContext, $request);
 	}

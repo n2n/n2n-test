@@ -23,15 +23,40 @@ namespace n2n\test;
 
 use n2n\core\container\N2nContext;
 use n2n\core\N2N;
+use n2n\core\container\impl\AppN2nContext;
 
 class TestEnv {
-	
+
+	private static ?N2nContext $n2ncontext = null;
+
+	/**
+	 * @param N2nContext|null $n2NContext
+	 * @return N2nContext
+	 */
+	static function replaceN2nContext(N2nContext $n2NContext = null): N2nContext {
+		return self::$n2ncontext = $n2NContext ?? self::copyN2nContext();
+	}
+
+	/**
+	 * @return N2nContext
+	 */
+	static function copyN2nContext(): N2nContext {
+		return AppN2nContext::createCopy(N2N::getN2nContext());
+	}
+
+	/**
+	 * @return N2nContext
+	 */
+	static function getN2nContext(): N2nContext {
+		return self::$n2ncontext ?? N2N::getN2nContext();
+	}
+
 	/**
 	 * @param N2nContext $n2nContext
 	 * @return \n2n\test\ContainerTestEnv
 	 */
 	public static function container(N2nContext $n2nContext = null) {
-		return new ContainerTestEnv($n2nContext ?? N2N::getN2nContext());
+		return new ContainerTestEnv($n2nContext ?? self::getN2nContext());
 	}
 	
 	/**
@@ -39,7 +64,7 @@ class TestEnv {
 	 * @return \n2n\test\HttpTestEnv
 	 */
 	public static function http(N2nContext $n2nContext = null) {
-		return new HttpTestEnv($n2nContext ?? N2N::getN2nContext());
+		return new HttpTestEnv($n2nContext ?? self::getN2nContext());
 	}
 	
 	/**
@@ -47,7 +72,7 @@ class TestEnv {
 	 * @return \n2n\test\OrmTestEnv
 	 */
 	public static function orm(N2nContext $n2nContext = null) {
-		return new OrmTestEnv($n2nContext ?? N2N::getN2nContext());
+		return new OrmTestEnv($n2nContext ?? self::getN2nContext());
 	}
 	
 	/**
@@ -55,7 +80,7 @@ class TestEnv {
 	 * @return DbTestEnv
 	 */
 	public static function db(N2nContext $n2nContext = null) {
-		return new DbTestEnv($n2nContext ?? N2N::getN2nContext());
+		return new DbTestEnv($n2nContext ?? self::getN2nContext());
 	}
 	
 	/**
@@ -75,7 +100,16 @@ class TestEnv {
 	public static function lookup($id, N2nContext $n2nContext = null) {
 		return self::container()->lookup($id);
 	}
-	
+
+	/**
+	 * @param string $id
+	 * @param object $obj
+	 * @return void
+	 */
+	static function inject(string $id, object $obj) {
+		return self::container()->inject($id);
+	}
+
 	/**
 	 * @param string $persistenceUnitName
 	 * @param N2nContext $n2nContext

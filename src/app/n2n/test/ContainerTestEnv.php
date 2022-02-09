@@ -55,9 +55,17 @@ class ContainerTestEnv {
 	
 	/**
 	 * @param string|\ReflectionClass $id
-	 * @return object
+	 * @return mixed
 	 */
 	public function lookup($id) {
 		return $this->n2nContext->lookup($id);
+	}
+
+	/**
+	 * @param string|\ReflectionClass $id
+	 * @return void
+	 */
+	public function inject(string $id, object $obj) {
+		$this->n2nContext->putLookupInjection($id, $obj);
 	}
 }
