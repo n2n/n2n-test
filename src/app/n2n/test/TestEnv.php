@@ -98,7 +98,7 @@ class TestEnv {
 	 * @return mixed
 	 */
 	public static function lookup($id, N2nContext $n2nContext = null) {
-		return self::container()->lookup($id);
+		return self::container($n2nContext)->lookup($id);
 	}
 
 	/**
@@ -106,8 +106,8 @@ class TestEnv {
 	 * @param object $obj
 	 * @return void
 	 */
-	static function inject(string $id, object $obj) {
-		return self::container()->inject($id);
+	static function inject(string $id, object $obj, N2nContext $n2nContext = null) {
+		return self::container($n2nContext)->inject($id);
 	}
 
 	/**
@@ -116,7 +116,7 @@ class TestEnv {
 	 * @return \n2n\persistence\orm\EntityManager
 	 */
 	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
-		return self::orm()->em(false, $persistenceUnitName);
+		return self::orm($n2nContext)->em(false, $persistenceUnitName);
 	}
 	
 	/**
@@ -125,6 +125,6 @@ class TestEnv {
 	 * @return \n2n\persistence\orm\EntityManager
 	 */
 	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
-		return self::orm()->em(true, $persistenceUnitName);
+		return self::orm($n2nContext)->em(true, $persistenceUnitName);
 	}
 }
