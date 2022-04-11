@@ -284,6 +284,13 @@ class TestResponse {
 	}
 
 	/**
+	 * @return bool
+	 */
+	function isBufferable(): bool {
+		return $this->response->getSentPayload()->isBufferable();
+	}
+
+	/**
 	 * @return int
 	 */
 	function getStatus() {
