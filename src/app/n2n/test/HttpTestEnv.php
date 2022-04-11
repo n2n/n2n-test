@@ -291,6 +291,13 @@ class TestResponse {
 	}
 
 	/**
+	 * @return Payload
+	 */
+	function getSentPayload(): Payload {
+		return $this->response->getSentPayload();
+	}
+
+	/**
 	 * @return int
 	 */
 	function getStatus() {
