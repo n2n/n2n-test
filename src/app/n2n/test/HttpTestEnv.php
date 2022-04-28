@@ -47,12 +47,12 @@ use n2n\util\io\IoUtils;
 use n2n\reflection\magic\MagicMethodInvoker;
 
 class HttpTestEnv {
-	
+
 	/**
 	 * @var N2nContext
 	 */
 	private $n2nContext;
-	
+
 	/**
 	 * @param N2nContext $n2nContext
 	 */
@@ -69,27 +69,27 @@ class HttpTestEnv {
 		if ($contextUrl === null) {
 			$contextUrl = Url::create('https://www.test-url.ch/');
 		}
-		
+
 		$request = new SimpleRequest($contextUrl);
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
-		
+
 		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
 		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(),$appN2nContext, null);
-		
-		
+
+
 		$appN2nContext->setHttpContext($httpContext);
 		if ($subsystemName !== null) {
 			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
 		}
-		
+
 //		$pdoPool = $appN2nContext->lookup(PdoPool::class);
 //		foreach ($this->n2nContext->lookup(PdoPool::class)->getInitializedPdos() as $puName => $pdo) {
 //			$pdoPool->setPdo($puName, $pdo);
 //		}
-		
+
 		return new TestRequest($httpContext, $request);
 	}
-	
+
 	/**
 	 * @param FsPath $fsPath
 	 * @return UploadDefinition
@@ -97,7 +97,7 @@ class HttpTestEnv {
 	function newUploadDefinitionFromFsPath(FsPath $fsPath) {
 		$tmpFile = tempnam(sys_get_temp_dir(), 'n2n-test');
 		IoUtils::putContents($tmpFile, IoUtils::getContents((string) $fsPath));
-		
+
 		return new UploadDefinition(UPLOAD_ERR_OK, $fsPath->getName(), $tmpFile,
 				mime_content_type((string) $fsPath), $fsPath->getSize());
 	}
@@ -112,7 +112,7 @@ class TestRequest {
 	 * @var SimpleRequest
 	 */
 	private SimpleRequest $simpleRequest;
-	
+
 	/**
 	 * @param HttpContext $httpContext
 	 */
@@ -141,7 +141,7 @@ class TestRequest {
 		$this->httpContext->getN2nContext()->removeLookupInjection($className);
 		return $this;
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @return \n2n\test\TestRequest
@@ -155,7 +155,7 @@ class TestRequest {
 		$this->httpContext->setActiveSubsystemRule($this->httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($name));
 		return $this;
 	}
-	
+
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
@@ -164,7 +164,7 @@ class TestRequest {
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
 	}
-	
+
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
@@ -173,7 +173,7 @@ class TestRequest {
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
 	}
-	
+
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
@@ -182,7 +182,7 @@ class TestRequest {
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
 	}
-	
+
 	/**
 	 * @param mixed $cmdUrl will be passed to {@see Url::create()} for creation
 	 * @param mixed $postQuery will be passed to {@see Query::create()} for creation
@@ -191,14 +191,14 @@ class TestRequest {
 	function post($cmdUrl, $postQuery = null) {
 		$this->simpleRequest->setMethod(Method::POST);
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
-		
+
 		if ($postQuery !== null) {
 			$this->simpleRequest->setPostQuery(Query::create($postQuery));
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @param string $value
@@ -208,7 +208,7 @@ class TestRequest {
 		$this->simpleRequest->setHeader($name, $value);
 		return $this;
 	}
-	
+
 	/**
 	 * @param string|null $body
 	 * @return \n2n\test\TestRequest
@@ -217,7 +217,7 @@ class TestRequest {
 		$this->simpleRequest->setBody($body);
 		return $this;
 	}
-	
+
 	/**
 	 * @param array $data
 	 * @return \n2n\test\TestRequest
@@ -225,7 +225,7 @@ class TestRequest {
 	function bodyJson(array $data) {
 		return $this->body(StringUtils::jsonEncode($data));
 	}
-	
+
 	/**
 	 * @param UploadDefinition[] $uploadDefinitions
 	 * @return \n2n\test\TestRequest
@@ -234,7 +234,7 @@ class TestRequest {
 		$this->simpleRequest->setUploadDefinitions($uploadDefinitions);
 		return $this;
 	}
-	
+
 	/**
 	 * @return TestResponse
 	 */
@@ -243,7 +243,7 @@ class TestRequest {
 		 * @var ControllerRegistry $controllerRegistry
 		 */
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
-		
+
 		$controllingPlan = $controllerRegistry
 				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->httpContext->getActiveSubsystemRule());
 		$result = $controllingPlan->execute();
@@ -258,24 +258,27 @@ class TestRequest {
 
 		$response = $this->httpContext->getResponse();
 		$response->closeBuffer();
+
+		$this->httpContext->getN2nContext()->finalize();
+
 		return new TestResponse($response);
 	}
 }
 
 class TestResponse {
 	private $response;
-	
+
 	function __construct(Response $response) {
 		$this->response = $response;
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	function parseJson() {
 		return StringUtils::jsonDecode($this->getContents(), true);
 	}
-		
+
 	/**
 	 * @return string
 	 */
