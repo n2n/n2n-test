@@ -250,6 +250,7 @@ class TestRequest {
 
 		if (!$result->isSuccessful()) {
 			if (!$sendStatusView) {
+				$this->httpContext->getN2nContext()->finalize();
 				throw $result->getStatusException();
 			}
 
@@ -262,6 +263,10 @@ class TestRequest {
 		$this->httpContext->getN2nContext()->finalize();
 
 		return new TestResponse($response);
+	}
+
+	function __destruct() {
+		$this->httpContext->getN2nContext()->finalize();
 	}
 }
 
