@@ -24,6 +24,8 @@ namespace n2n\test;
 use n2n\core\container\N2nContext;
 use n2n\core\N2N;
 use n2n\core\container\impl\AppN2nContext;
+use n2n\util\cache\impl\EphemeralCacheStore;
+use n2n\context\config\SimpleLookupSession;
 
 class TestEnv {
 
@@ -41,7 +43,7 @@ class TestEnv {
 	 * @return N2nContext
 	 */
 	static function copyN2nContext(): N2nContext {
-		return AppN2nContext::createCopy(N2N::getN2nContext());
+		return AppN2nContext::createCopy(N2N::getN2nContext(), new SimpleLookupSession(), new EphemeralCacheStore());
 	}
 
 	/**

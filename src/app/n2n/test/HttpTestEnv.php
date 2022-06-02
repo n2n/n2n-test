@@ -45,6 +45,8 @@ use n2n\io\managed\FileSource;
 use n2n\io\managed\impl\FsFileSource;
 use n2n\util\io\IoUtils;
 use n2n\reflection\magic\MagicMethodInvoker;
+use n2n\util\cache\impl\EphemeralCacheStore;
+use n2n\context\config\SimpleLookupSession;
 
 class HttpTestEnv {
 
@@ -73,7 +75,7 @@ class HttpTestEnv {
 		$request = new SimpleRequest($contextUrl);
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 
-		$appN2nContext = AppN2nContext::createCopy($this->n2nContext);
+		$appN2nContext = AppN2nContext::createCopy($this->n2nContext, new SimpleLookupSession(), new EphemeralCacheStore());
 		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(),$appN2nContext, null);
 
 
