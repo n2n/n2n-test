@@ -109,7 +109,7 @@ class TestEnv {
 	 * @return void
 	 */
 	static function inject(string $id, object $obj, N2nContext $n2nContext = null) {
-		return self::container($n2nContext)->inject($id);
+		return self::container($n2nContext)->inject($id, $obj);
 	}
 
 	/**
