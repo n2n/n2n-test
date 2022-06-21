@@ -47,6 +47,13 @@ class TestEnv {
 	}
 
 	/**
+	 * @return void
+	 */
+	static function resetN2nContext() {
+		self::$n2ncontext = null;
+	}
+
+	/**
 	 * @return N2nContext
 	 */
 	static function getN2nContext(): N2nContext {
