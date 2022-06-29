@@ -47,6 +47,7 @@ use n2n\util\io\IoUtils;
 use n2n\reflection\magic\MagicMethodInvoker;
 use n2n\util\cache\impl\EphemeralCacheStore;
 use n2n\context\config\SimpleLookupSession;
+use n2n\util\ex\IllegalStateException;
 
 class HttpTestEnv {
 
@@ -106,21 +107,12 @@ class HttpTestEnv {
 }
 
 class TestRequest {
-	/**
-	 * @var HttpContext
-	 */
-	private $httpContext;
-	/**
-	 * @var SimpleRequest
-	 */
-	private SimpleRequest $simpleRequest;
 
 	/**
 	 * @param HttpContext $httpContext
+	 * @param SimpleRequest $simpleRequest
 	 */
-	function __construct(HttpContext $httpContext, SimpleRequest $simpleRequest) {
-		$this->httpContext = $httpContext;
-		$this->simpleRequest = $simpleRequest;
+	function __construct(private HttpContext $httpContext, private SimpleRequest $simpleRequest) {
 	}
 
 	/**
@@ -241,6 +233,10 @@ class TestRequest {
 	 * @return TestResponse
 	 */
 	function exec(bool $sendStatusView = false) {
+		if ($this->httpContext->getN2nContext()->getTransactionManager()->hasOpenTransaction()) {
+			throw new IllegalStateException('Can not execute TestRequest inside a N2nContext with an active transaction.');
+		}
+
 		/**
 		 * @var ControllerRegistry $controllerRegistry
 		 */
