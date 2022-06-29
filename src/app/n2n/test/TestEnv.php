@@ -47,6 +47,13 @@ class TestEnv {
 	}
 
 	/**
+	 * @return void
+	 */
+	static function resetN2nContext() {
+		self::$n2ncontext = null;
+	}
+
+	/**
 	 * @return N2nContext
 	 */
 	static function getN2nContext(): N2nContext {
@@ -109,7 +116,7 @@ class TestEnv {
 	 * @return void
 	 */
 	static function inject(string $id, object $obj, N2nContext $n2nContext = null) {
-		return self::container($n2nContext)->inject($id);
+		return self::container($n2nContext)->inject($id, $obj);
 	}
 
 	/**
