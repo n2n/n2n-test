@@ -22,7 +22,6 @@
 namespace n2n\test;
 
 use n2n\web\http\HttpContext;
-use n2n\core\HttpContextFactory;
 use n2n\web\http\SimpleRequest;
 use n2n\core\N2N;
 use n2n\util\uri\Query;
@@ -33,21 +32,17 @@ use n2n\core\container\impl\AppN2nContext;
 use n2n\web\http\Response;
 use n2n\util\StringUtils;
 use n2n\core\container\N2nContext;
-use n2n\core\config\AppConfig;
-use n2n\core\config\WebConfig;
-use n2n\util\type\CastUtils;
 use n2n\web\http\SimpleSession;
-use n2n\core\container\PdoPool;
 use n2n\web\http\UploadDefinition;
-use n2n\util\type\ArgUtils;
 use n2n\util\io\fs\FsPath;
-use n2n\io\managed\FileSource;
-use n2n\io\managed\impl\FsFileSource;
 use n2n\util\io\IoUtils;
 use n2n\reflection\magic\MagicMethodInvoker;
 use n2n\util\cache\impl\EphemeralCacheStore;
 use n2n\context\config\SimpleLookupSession;
 use n2n\util\ex\IllegalStateException;
+use n2n\web\ext\HttpContextFactory;
+use n2n\web\ext\HttpAddonContext;
+use n2n\web\http\ResponseCacheStore;
 
 class HttpTestEnv {
 
@@ -59,7 +54,7 @@ class HttpTestEnv {
 	/**
 	 * @param N2nContext $n2nContext
 	 */
-	function __construct(N2nContext $n2nContext) {
+	function __construct(AppN2nContext $n2nContext) {
 		$this->n2nContext = $n2nContext;
 	}
 
@@ -76,11 +71,18 @@ class HttpTestEnv {
 		$request = new SimpleRequest($contextUrl);
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 
-		$appN2nContext = AppN2nContext::createCopy($this->n2nContext, new SimpleLookupSession(), new EphemeralCacheStore());
-		$httpContext = HttpContextFactory::createFromAppConfig(N2N::getAppConfig(), $request, new SimpleSession(),$appN2nContext, null);
+		$appN2nContext = $this->n2nContext->copy(new SimpleLookupSession(), new EphemeralCacheStore());
+		$appConfig = N2N::getAppConfig();
 
+		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
+		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
+				$appN2nContext, $responseCacheStore, null);
 
-		$appN2nContext->setHttpContext($httpContext);
+		$controllerRegistry = new ControllerRegistry($appConfig->web(), $httpContext);
+		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
+		$appN2nContext->setHttp($controllerInvoker);
+		$appN2nContext->addAddonContext($controllerInvoker);
+
 		if ($subsystemName !== null) {
 			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
 		}
