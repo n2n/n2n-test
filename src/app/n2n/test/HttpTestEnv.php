@@ -43,6 +43,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\web\ext\HttpContextFactory;
 use n2n\web\ext\HttpAddonContext;
 use n2n\web\http\ResponseCacheStore;
+use n2n\web\http\payload\Payload;
 
 class HttpTestEnv {
 
@@ -245,7 +246,8 @@ class TestRequest {
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 
 		$controllingPlan = $controllerRegistry
-				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->httpContext->getActiveSubsystemRule());
+				->createControllingPlan($this->httpContext, $this->simpleRequest->getCmdPath(),
+						$this->httpContext->getActiveSubsystemRule());
 		$result = $controllingPlan->execute();
 
 		if (!$result->isSuccessful()) {
@@ -277,18 +279,19 @@ class TestResponse {
 		$this->response = $response;
 	}
 
-	/**
-	 * @return array
-	 */
-	function parseJson() {
-		return StringUtils::jsonDecode($this->getContents(), true);
+	function parseJson(): ?array {
+		if (null !== ($contents = $this->getContents())) {
+			return StringUtils::jsonDecode($contents, true);
+		}
+
+		return null;
 	}
 
 	/**
 	 * @return string
 	 */
 	function getContents() {
-		return $this->response->getSentPayload()->getBufferedContents();
+		return $this->response->getSentPayload()?->getBufferedContents();
 	}
 
 	/**
