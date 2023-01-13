@@ -43,7 +43,7 @@ class TestEnv {
 	 * @return N2nContext
 	 */
 	static function copyN2nContext(): N2nContext {
-		return AppN2nContext::createCopy(N2N::getN2nContext(), new SimpleLookupSession(), new EphemeralCacheStore());
+		return N2N::getN2nContext()->copy(new SimpleLookupSession(), new EphemeralCacheStore());
 	}
 
 	/**
@@ -116,7 +116,7 @@ class TestEnv {
 	 * @return void
 	 */
 	static function inject(string $id, object $obj, N2nContext $n2nContext = null) {
-		return self::container($n2nContext)->inject($id, $obj);
+		self::container($n2nContext)->inject($id, $obj);
 	}
 
 	/**
