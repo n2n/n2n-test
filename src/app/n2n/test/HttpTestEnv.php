@@ -81,8 +81,12 @@ class HttpTestEnv {
 
 		$controllerRegistry = new ControllerRegistry($appConfig->web(), $httpContext);
 		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
+
+		// TODO: think of some better way.
+		$appN2nContext->removeAddonContextByType(HttpAddonContext::class);
 		$appN2nContext->setHttp($controllerInvoker);
 		$appN2nContext->addAddonContext($controllerInvoker);
+		// END TODO: think of some better way.
 
 		if ($subsystemName !== null) {
 			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
