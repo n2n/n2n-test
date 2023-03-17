@@ -43,6 +43,7 @@ use n2n\util\ex\IllegalStateException;
 use n2n\web\ext\HttpContextFactory;
 use n2n\web\ext\HttpAddonContext;
 use n2n\web\http\ResponseCacheStore;
+use n2n\web\http\payload\Payload;
 
 class HttpTestEnv {
 
@@ -80,8 +81,12 @@ class HttpTestEnv {
 
 		$controllerRegistry = new ControllerRegistry($appConfig->web(), $httpContext);
 		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
+
+		// TODO: think of some better way.
+		$appN2nContext->removeAddonContextByType(HttpAddonContext::class);
 		$appN2nContext->setHttp($controllerInvoker);
 		$appN2nContext->addAddonContext($controllerInvoker);
+		// END TODO: think of some better way.
 
 		if ($subsystemName !== null) {
 			$httpContext->setActiveSubsystemRule($httpContext->findBestSubsystemRuleBySubsystemAndN2nLocale($subsystemName));
@@ -245,7 +250,8 @@ class TestRequest {
 		$controllerRegistry = $this->httpContext->getN2nContext()->lookup(ControllerRegistry::class);
 
 		$controllingPlan = $controllerRegistry
-				->createControllingPlan($this->simpleRequest->getCmdPath(), $this->httpContext->getActiveSubsystemRule());
+				->createControllingPlan($this->httpContext, $this->simpleRequest->getCmdPath(),
+						$this->httpContext->getActiveSubsystemRule());
 		$result = $controllingPlan->execute();
 
 		if (!$result->isSuccessful()) {
@@ -277,18 +283,19 @@ class TestResponse {
 		$this->response = $response;
 	}
 
-	/**
-	 * @return array
-	 */
-	function parseJson() {
-		return StringUtils::jsonDecode($this->getContents(), true);
+	function parseJson(): ?array {
+		if (null !== ($contents = $this->getContents())) {
+			return StringUtils::jsonDecode($contents, true);
+		}
+
+		return null;
 	}
 
 	/**
 	 * @return string
 	 */
 	function getContents() {
-		return $this->response->getSentPayload()->getBufferedContents();
+		return $this->response->getSentPayload()?->getBufferedContents();
 	}
 
 	/**
