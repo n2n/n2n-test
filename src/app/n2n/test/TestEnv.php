@@ -49,7 +49,9 @@ class TestEnv {
 
 	static function resetN2nContext(): void {
 		while (null !== ($additionalN2nContext = array_pop(self::$additionalN2nContexts))) {
-			$additionalN2nContext->finalize();
+			if (!$additionalN2nContext->isFinalized()) {
+				$additionalN2nContext->finalize();
+			}
 		}
 
 		self::$n2nContext?->finalize();
