@@ -127,13 +127,13 @@ class TestRequest {
 	 * @return $this
 	 * @throws \ReflectionException
 	 */
-	function inject(\Closure $closure) {
+	function inject(\Closure $closure): static {
 		$invoker = new MagicMethodInvoker($this->httpContext->getN2nContext());
 		$invoker->invoke(null, new \ReflectionFunction($closure));
 		return $this;
 	}
 
-	function putLookupInjection(string $className, object $obj) {
+	function putLookupInjection(string $className, object $obj): static {
 		$this->httpContext->getN2nContext()->putLookupInjection($className, $obj);
 		return $this;
 	}
@@ -147,7 +147,7 @@ class TestRequest {
 	 * @param string $name
 	 * @return \n2n\test\TestRequest
 	 */
-	function subsystem(?string $name) {
+	function subsystem(?string $name): static {
 		if ($name === null) {
 			$this->httpContext->setActiveSubsystemRule(null);
 			return $this;
@@ -160,7 +160,7 @@ class TestRequest {
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
-	function get($cmdUrl) {
+	function get($cmdUrl): static {
 		$this->simpleRequest->setMethod(Method::GET);
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
@@ -169,7 +169,7 @@ class TestRequest {
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
-	function put($cmdUrl) {
+	function put($cmdUrl): static {
 		$this->simpleRequest->setMethod(Method::PUT);
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
@@ -178,7 +178,7 @@ class TestRequest {
 	/**
 	 * @return \n2n\test\TestRequest
 	 */
-	function delete($cmdUrl) {
+	function delete($cmdUrl): static {
 		$this->simpleRequest->setMethod(Method::DELETE);
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 		return $this;
@@ -189,7 +189,7 @@ class TestRequest {
 	 * @param mixed $postQuery will be passed to {@see Query::create()} for creation
 	 * @return \n2n\test\TestRequest
 	 */
-	function post($cmdUrl, $postQuery = null) {
+	function post($cmdUrl, $postQuery = null): static {
 		$this->simpleRequest->setMethod(Method::POST);
 		$this->simpleRequest->setCmdUrl(Url::create($cmdUrl));
 
@@ -205,7 +205,7 @@ class TestRequest {
 	 * @param string $value
 	 * @return \n2n\test\TestRequest
 	 */
-	function header(string $name, string $value) {
+	function header(string $name, string $value): static {
 		$this->simpleRequest->setHeader($name, $value);
 		return $this;
 	}
@@ -214,7 +214,7 @@ class TestRequest {
 	 * @param string|null $body
 	 * @return \n2n\test\TestRequest
 	 */
-	function body(?string $body) {
+	function body(?string $body): static {
 		$this->simpleRequest->setBody($body);
 		return $this;
 	}
@@ -272,7 +272,10 @@ class TestRequest {
 	}
 
 	function __destruct() {
-		$this->httpContext->getN2nContext()->finalize();
+		$n2nContext = $this->httpContext->getN2nContext();
+		if (!$n2nContext->isFinalized()) {
+			$n2nContext->finalize();
+		}
 	}
 }
 
