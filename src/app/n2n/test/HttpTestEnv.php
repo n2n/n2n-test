@@ -72,7 +72,7 @@ class HttpTestEnv {
 		$request = new SimpleRequest($contextUrl);
 		$request->setN2nLocale($this->n2nContext->getN2nLocale());
 
-		$appN2nContext = $this->n2nContext->copy(new SimpleLookupSession(), new EphemeralCacheStore());
+		$appN2nContext = TestEnv::forkN2nContext();
 		$appConfig = N2N::getAppConfig();
 
 		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
