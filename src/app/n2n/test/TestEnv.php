@@ -29,84 +29,55 @@ use n2n\context\config\SimpleLookupSession;
 
 class TestEnv {
 
-	private static ?N2nContext $n2ncontext = null;
+	private static ?AppN2nContext $n2nContext = null;
 
-	/**
-	 * @param N2nContext|null $n2NContext
-	 * @return N2nContext
-	 */
-	static function replaceN2nContext(N2nContext $n2NContext = null): N2nContext {
-		return self::$n2ncontext = $n2NContext ?? self::copyN2nContext();
+	private static array $additionalN2nContexts = [];
+
+	static function replaceN2nContext(): N2nContext {
+		self::resetN2nContext();
+
+		return self::getN2nContext();
 	}
 
-	/**
-	 * @return N2nContext
-	 */
-	static function copyN2nContext(): N2nContext {
-		return N2N::getN2nContext()->copy(new SimpleLookupSession(), new EphemeralCacheStore());
+	static function getN2nContext(): AppN2nContext {
+		return self::$n2nContext ?? self::$n2nContext = N2N::forkN2nContext(keepTransactionContext: true);
 	}
 
-	/**
-	 * @return void
-	 */
-	static function resetN2nContext() {
-		self::$n2ncontext = null;
+	static function forkN2nContext(): AppN2nContext {
+		return self::$additionalN2nContexts[] = N2N::forkN2nContext(keepTransactionContext: true);
 	}
 
-	/**
-	 * @return N2nContext
-	 */
-	static function getN2nContext(): N2nContext {
-		return self::$n2ncontext ?? N2N::getN2nContext();
+	static function resetN2nContext(): void {
+		while (null !== ($additionalN2nContext = array_pop(self::$additionalN2nContexts))) {
+			$additionalN2nContext->finalize();
+		}
+
+		self::$n2nContext?->finalize();
+		self::$n2nContext = null;
 	}
 
-	/**
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\test\ContainerTestEnv
-	 */
-	public static function container(N2nContext $n2nContext = null) {
+	public static function container(N2nContext $n2nContext = null): ContainerTestEnv {
 		return new ContainerTestEnv($n2nContext ?? self::getN2nContext());
 	}
-	
-	/**
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\test\HttpTestEnv
-	 */
-	public static function http(N2nContext $n2nContext = null) {
+
+	public static function http(N2nContext $n2nContext = null): HttpTestEnv {
 		return new HttpTestEnv($n2nContext ?? self::getN2nContext());
 	}
-	
-	/**
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\test\OrmTestEnv
-	 */
-	public static function orm(N2nContext $n2nContext = null) {
+
+	public static function orm(N2nContext $n2nContext = null): OrmTestEnv {
 		return new OrmTestEnv($n2nContext ?? self::getN2nContext());
 	}
-	
-	/**
-	 * @param N2nContext $n2nContext
-	 * @return DbTestEnv
-	 */
-	public static function db(N2nContext $n2nContext = null) {
+
+	public static function db(N2nContext $n2nContext = null): DbTestEnv {
 		return new DbTestEnv($n2nContext ?? self::getN2nContext());
 	}
-	
-	/**
-	 * @param bool $readOnly
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\core\container\Transaction
-	 */
-	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null) {
+
+	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null): \n2n\core\container\Transaction {
 		return self::container($n2nContext)->tm()->createTransaction($readOnly);
 	}
 	
-	/**
-	 * @param string|\ReflectionClass $id
-	 * @param N2nContext $n2nContext
-	 * @return mixed
-	 */
-	public static function lookup($id, N2nContext $n2nContext = null) {
+
+	public static function lookup($id, N2nContext $n2nContext = null): mixed {
 		return self::container($n2nContext)->lookup($id);
 	}
 
@@ -115,25 +86,16 @@ class TestEnv {
 	 * @param object $obj
 	 * @return void
 	 */
-	static function inject(string $id, object $obj, N2nContext $n2nContext = null) {
+	static function inject(string $id, object $obj, N2nContext $n2nContext = null): void {
 		self::container($n2nContext)->inject($id, $obj);
 	}
 
-	/**
-	 * @param string $persistenceUnitName
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\persistence\orm\EntityManager
-	 */
-	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
+
+	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null): \n2n\persistence\orm\EntityManager {
 		return self::orm($n2nContext)->em(false, $persistenceUnitName);
 	}
-	
-	/**
-	 * @param string $persistenceUnitName
-	 * @param N2nContext $n2nContext
-	 * @return \n2n\persistence\orm\EntityManager
-	 */
-	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null) {
+
+	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null): \n2n\persistence\orm\EntityManager {
 		return self::orm($n2nContext)->em(true, $persistenceUnitName);
 	}
 }

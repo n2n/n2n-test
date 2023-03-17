@@ -26,12 +26,13 @@ use n2n\core\container\N2nContext;
 use n2n\persistence\ext\PdoPool;
 use n2n\util\type\CastUtils;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\ext\EmPool;
 
 class OrmTestEnv {
 	/**
 	 * @var N2nContext
 	 */
-	private $n2nContext;
+	private N2nContext $n2nContext;
 	
 	/**
 	 * @param N2nContext $n2nContext
@@ -44,7 +45,7 @@ class OrmTestEnv {
 	 * Alias for
 	 * @see OrmTestEnv::getEntityManager()
 	 */
-	public function em(bool $transactional = false, string $persistenceUnitName = null) {
+	public function em(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
 		return $this->getEntityManager($transactional, $persistenceUnitName);
 	}
 	
@@ -52,7 +53,7 @@ class OrmTestEnv {
 	 * @param string $persistenceUnitName
 	 * @return EntityManager
 	 */
-	public function getEntityManager(bool $transactional = false, string $persistenceUnitName = null) {
+	public function getEntityManager(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
 		$emf = $this->getEntityManagerFactory($persistenceUnitName);
 		
 		return $transactional ? $emf->getTransactional() : $emf->getExtended();
@@ -62,7 +63,7 @@ class OrmTestEnv {
 	 * Alias for
 	 * @see self::getEntityManagerFactory()
 	 */
-	public function emf(string $persistenceUnitName = null) {
+	public function emf(string $persistenceUnitName = null): \n2n\persistence\orm\EntityManagerFactory {
 		return $this->getEntityManagerFactory($persistenceUnitName);
 	}
 	
@@ -70,9 +71,9 @@ class OrmTestEnv {
 	 * @param string $persistenceUnitName
 	 * @return \n2n\persistence\orm\EntityManagerFactory
 	 */
-	public function getEntityManagerFactory(string $persistenceUnitName = null) {
-		$pdoPool = $this->n2nContext->lookup(PdoPool::class);
-		CastUtils::assertTrue($pdoPool instanceof PdoPool);
+	public function getEntityManagerFactory(string $persistenceUnitName = null): \n2n\persistence\orm\EntityManagerFactory {
+		$pdoPool = $this->n2nContext->lookup(EmPool::class);
+		CastUtils::assertTrue($pdoPool instanceof EmPool);
 		
 		return $pdoPool->getEntityManagerFactory($persistenceUnitName);
 	}
