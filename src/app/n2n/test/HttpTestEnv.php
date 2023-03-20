@@ -83,7 +83,14 @@ class HttpTestEnv {
 		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
 
 		// TODO: think of some better way.
-		$appN2nContext->getHttp()?->finalize();
+		foreach ($appN2nContext->getAddonContexts() as $addonContext) {
+			if (!($addonContext instanceof HttpAddonContext)) {
+				continue;
+			}
+
+			$addonContext->finalize();
+			$appN2nContext->removeAddonContext($addonContext);
+		}
 
 		$appN2nContext->removeAddonContextByType(HttpAddonContext::class);
 		$appN2nContext->setHttp($controllerInvoker);
