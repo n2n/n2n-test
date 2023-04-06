@@ -79,7 +79,7 @@ class HttpTestEnv {
 		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
 				$appN2nContext, $responseCacheStore, null);
 
-		$controllerRegistry = new ControllerRegistry($appConfig->web(), $httpContext);
+		$controllerRegistry = new ControllerRegistry($appConfig->web(), $appConfig->routing());
 		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
 
 		// TODO: think of some better way.
