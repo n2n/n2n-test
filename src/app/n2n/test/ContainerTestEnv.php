@@ -54,10 +54,11 @@ class ContainerTestEnv {
 	}
 	
 	/**
-	 * @param string|\ReflectionClass $id
-	 * @return mixed
+	 * @template T
+	 * @param class-string<T>|\ReflectionClass $id
+	 * @return T|mixed
 	 */
-	public function lookup($id) {
+	public function lookup(string|\ReflectionClass $id): mixed {
 		return $this->n2nContext->lookup($id);
 	}
 
