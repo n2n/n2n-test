@@ -63,10 +63,13 @@ class ContainerTestEnv {
 	}
 
 	/**
-	 * @param string|\ReflectionClass $id
-	 * @return void
+	 * @template T
+	 * @param class-string<T> $id
+	 * @param T $obj
+	 * @return ContainerTestEnv
 	 */
-	public function inject(string $id, object $obj) {
+	public function inject(string $id, mixed $obj): static {
 		$this->n2nContext->putLookupInjection($id, $obj);
+		return $this;
 	}
 }
