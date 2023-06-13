@@ -77,8 +77,13 @@ class TestEnv {
 	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null): \n2n\core\container\Transaction {
 		return self::container($n2nContext)->tm()->createTransaction($readOnly);
 	}
-	
 
+
+	/**
+	 * @template T
+	 * @param class-string<T>|\ReflectionClass $id
+	 * @return T|mixed
+	 */
 	public static function lookup($id, N2nContext $n2nContext = null): mixed {
 		return self::container($n2nContext)->lookup($id);
 	}
