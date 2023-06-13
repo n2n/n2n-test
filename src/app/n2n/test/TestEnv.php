@@ -84,7 +84,7 @@ class TestEnv {
 	 * @param class-string<T>|\ReflectionClass $id
 	 * @return T|mixed
 	 */
-	public static function lookup($id, N2nContext $n2nContext = null): mixed {
+	public static function lookup(string|\ReflectionClass $id, N2nContext $n2nContext = null): mixed {
 		return self::container($n2nContext)->lookup($id);
 	}
 
