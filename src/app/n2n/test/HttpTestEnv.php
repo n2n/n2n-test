@@ -44,6 +44,7 @@ use n2n\web\ext\HttpContextFactory;
 use n2n\web\ext\HttpAddonContext;
 use n2n\web\http\ResponseCacheStore;
 use n2n\web\http\payload\Payload;
+use n2n\web\http\cache\PayloadCacheStore;
 
 class HttpTestEnv {
 
@@ -76,11 +77,12 @@ class HttpTestEnv {
 		$appConfig = N2N::getAppConfig();
 
 		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
+		$payloadCacheStore = new PayloadCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
 		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
 				$appN2nContext, $responseCacheStore, null);
 
 		$controllerRegistry = new ControllerRegistry($appConfig->web(), $appConfig->routing());
-		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore);
+		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore, $payloadCacheStore);
 
 		// TODO: think of some better way.
 		foreach ($appN2nContext->getAddonContexts() as $addonContext) {
