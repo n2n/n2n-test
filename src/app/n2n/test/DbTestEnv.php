@@ -49,24 +49,31 @@ class DbTestEnv {
 		
 		return $pdoPool->getPdo($persistenceUnitName);
 	}
-	
+
 	/**
 	 * Truncates all tables in the database of the passed persitence unit.
-	 * 
-	 * @param string $persistenceUnitName if null the database of the default persistence unit will be used.
+	 *
+	 * @param string|null $persistenceUnitName if null the database of the default persistence unit will be used.
+	 * @param array|null $metaEntityNames
 	 * @return DbTestEnv
 	 */
-	public function truncate(string $persistenceUnitName = null) {
+	public function truncate(string $persistenceUnitName = null, array $metaEntityNames = null): static {
 		$pdo = $this->pdo($persistenceUnitName);
 		$metaData = $pdo->getMetaData();
 		$db = $metaData->getDatabase();
-		
-		foreach ($db->getMetaEntities() as $metaEntity) {
+
+		if ($metaEntityNames === null) {
+			$metaEntities = $db->getMetaEntities();
+		} else {
+			$metaEntities = array_map(fn ($n) => $db->getMetaEntityByName($n), $metaEntityNames);
+		}
+
+		foreach ($metaEntities as $metaEntity) {
 			$delStmtBuilder = $metaData->createDeleteStatementBuilder();
 			$delStmtBuilder->setTable($metaEntity->getName());
 			$pdo->exec($delStmtBuilder->toSqlString());
 		}
-		
+
 		return $this;
 	}
 }
