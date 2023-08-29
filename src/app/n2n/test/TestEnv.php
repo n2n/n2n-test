@@ -27,6 +27,9 @@ use n2n\core\container\impl\AppN2nContext;
 use n2n\util\cache\impl\EphemeralCacheStore;
 use n2n\context\config\SimpleLookupSession;
 use n2n\core\cache\AppCache;
+use n2n\core\container\Transaction;
+use ReflectionClass;
+use n2n\persistence\orm\EntityManager;
 
 class TestEnv {
 
@@ -79,23 +82,24 @@ class TestEnv {
 		return new DbTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null): \n2n\core\container\Transaction {
+	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null): Transaction {
 		return self::container($n2nContext)->tm()->createTransaction($readOnly);
 	}
 
 
 	/**
 	 * @template T
-	 * @param class-string<T>|\ReflectionClass $id
+	 * @param class-string<T>|ReflectionClass $id
 	 * @return T|mixed
 	 */
-	public static function lookup(string|\ReflectionClass $id, N2nContext $n2nContext = null): mixed {
+	public static function lookup(string|ReflectionClass $id, N2nContext $n2nContext = null): mixed {
 		return self::container($n2nContext)->lookup($id);
 	}
 
 	/**
 	 * @param string $id
 	 * @param object $obj
+	 * @param N2nContext|null $n2nContext
 	 * @return void
 	 */
 	static function inject(string $id, object $obj, N2nContext $n2nContext = null): void {
@@ -103,11 +107,19 @@ class TestEnv {
 	}
 
 
-	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null): \n2n\persistence\orm\EntityManager {
+	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null): EntityManager {
 		return self::orm($n2nContext)->em(false, $persistenceUnitName);
 	}
 
-	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null): \n2n\persistence\orm\EntityManager {
+	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null): EntityManager {
 		return self::orm($n2nContext)->em(true, $persistenceUnitName);
+	}
+
+	public static function emUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): OrmTestEmUtil {
+		return self::orm($n2nContext)->emUtil(false, $persistenceUnitName);
+	}
+
+	public static function temUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): OrmTestEmUtil {
+		return self::orm($n2nContext)->emUtil(true, $persistenceUnitName);
 	}
 }

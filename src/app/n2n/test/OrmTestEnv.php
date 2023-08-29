@@ -19,6 +19,7 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
+
 namespace n2n\test;
 
 
@@ -27,20 +28,21 @@ use n2n\persistence\ext\PdoPool;
 use n2n\util\type\CastUtils;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\ext\EmPool;
+use n2n\persistence\orm\EntityManagerFactory;
 
 class OrmTestEnv {
 	/**
 	 * @var N2nContext
 	 */
 	private N2nContext $n2nContext;
-	
+
 	/**
 	 * @param N2nContext $n2nContext
 	 */
 	public function __construct(N2nContext $n2nContext) {
 		$this->n2nContext = $n2nContext;
 	}
-	
+
 	/**
 	 * Alias for
 	 * @see OrmTestEnv::getEntityManager()
@@ -48,33 +50,38 @@ class OrmTestEnv {
 	public function em(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
 		return $this->getEntityManager($transactional, $persistenceUnitName);
 	}
-	
+
 	/**
-	 * @param string $persistenceUnitName
+	 * @param bool $transactional
+	 * @param string|null $persistenceUnitName
 	 * @return EntityManager
 	 */
 	public function getEntityManager(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
 		$emf = $this->getEntityManagerFactory($persistenceUnitName);
-		
+
 		return $transactional ? $emf->getTransactional() : $emf->getExtended();
 	}
-	
+
 	/**
 	 * Alias for
 	 * @see self::getEntityManagerFactory()
 	 */
-	public function emf(string $persistenceUnitName = null): \n2n\persistence\orm\EntityManagerFactory {
+	public function emf(string $persistenceUnitName = null): EntityManagerFactory {
 		return $this->getEntityManagerFactory($persistenceUnitName);
 	}
-	
+
 	/**
-	 * @param string $persistenceUnitName
-	 * @return \n2n\persistence\orm\EntityManagerFactory
+	 * @param string|null $persistenceUnitName
+	 * @return EntityManagerFactory
 	 */
-	public function getEntityManagerFactory(string $persistenceUnitName = null): \n2n\persistence\orm\EntityManagerFactory {
+	public function getEntityManagerFactory(string $persistenceUnitName = null): EntityManagerFactory {
 		$pdoPool = $this->n2nContext->lookup(EmPool::class);
 		CastUtils::assertTrue($pdoPool instanceof EmPool);
-		
+
 		return $pdoPool->getEntityManagerFactory($persistenceUnitName);
+	}
+
+	public function emUtil(bool $transactional = false, string $persistenceUnitName = null): OrmTestEmUtil {
+		return new OrmTestEmUtil(self::getEntityManager($transactional, $persistenceUnitName));
 	}
 }
