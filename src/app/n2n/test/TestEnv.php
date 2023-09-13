@@ -37,8 +37,10 @@ class TestEnv {
 
 	private static array $additionalN2nContexts = [];
 
-	static function replaceN2nContext(): N2nContext {
+	static function replaceN2nContext(bool $keepTransactionContext = true): N2nContext {
 		self::resetN2nContext();
+
+		self::$n2nContext = N2N::forkN2nContext(keepTransactionContext: $keepTransactionContext);
 
 		return self::getN2nContext();
 	}
@@ -47,8 +49,8 @@ class TestEnv {
 		return self::$n2nContext ?? self::$n2nContext = N2N::forkN2nContext(keepTransactionContext: true);
 	}
 
-	static function forkN2nContext(): AppN2nContext {
-		return self::$additionalN2nContexts[] = N2N::forkN2nContext(keepTransactionContext: true);
+	static function forkN2nContext(bool $keepTransactionContext = true): AppN2nContext {
+		return self::$additionalN2nContexts[] = N2N::forkN2nContext(keepTransactionContext: $keepTransactionContext);
 	}
 
 	static function resetN2nContext(): void {
