@@ -298,8 +298,8 @@ class TestResponse {
 		$this->response = $response;
 	}
 
-	function parseJson(): ?array {
-		if (null !== ($contents = $this->getContents())) {
+	function parseJson(bool $sentPayloadOnly = true): ?array {
+		if (null !== ($contents = $this->getContents($sentPayloadOnly))) {
 			return StringUtils::jsonDecode($contents, true);
 		}
 
@@ -309,12 +309,16 @@ class TestResponse {
 	/**
 	 * @return string|null
 	 */
-	function getContents(): ?string {
-		if ($this->isBufferable()) {
-			return $this->response->getBufferableOutput();
+	function getContents(bool $sentPayloadOnly = true): ?string {
+		if (!$this->isBufferable()) {
+			throw new UnsupportedOperationException('Sent Payload is not bufferable.');
 		}
 
-		throw new UnsupportedOperationException('Sent Payload is not bufferable.');
+		if ($sentPayloadOnly) {
+			return $this->response->getSentPayload()->getBufferedContents();
+		}
+
+		return $this->response->getBufferableOutput();
 	}
 
 	/**
