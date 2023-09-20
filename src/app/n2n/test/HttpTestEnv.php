@@ -37,14 +37,14 @@ use n2n\web\http\UploadDefinition;
 use n2n\util\io\fs\FsPath;
 use n2n\util\io\IoUtils;
 use n2n\reflection\magic\MagicMethodInvoker;
-use n2n\util\cache\impl\EphemeralCacheStore;
-use n2n\context\config\SimpleLookupSession;
 use n2n\util\ex\IllegalStateException;
 use n2n\web\ext\HttpContextFactory;
 use n2n\web\ext\HttpAddonContext;
 use n2n\web\http\ResponseCacheStore;
 use n2n\web\http\payload\Payload;
 use n2n\web\http\cache\PayloadCacheStore;
+use n2n\web\http\FlushMode;
+use n2n\util\ex\UnsupportedOperationException;
 
 class HttpTestEnv {
 
@@ -275,6 +275,7 @@ class TestRequest {
 		}
 
 		$response = $this->httpContext->getResponse();
+		$response->flush(FlushMode::SILENT);
 		$response->closeBuffer();
 
 		$this->httpContext->getN2nContext()->finalize();
@@ -306,10 +307,14 @@ class TestResponse {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	function getContents() {
-		return $this->response->getSentPayload()?->getBufferedContents();
+	function getContents(): ?string {
+		if ($this->isBufferable()) {
+			return $this->response->getBufferableOutput();
+		}
+
+		throw new UnsupportedOperationException('Sent Payload is not bufferable.');
 	}
 
 	/**
@@ -329,7 +334,7 @@ class TestResponse {
 	/**
 	 * @return int
 	 */
-	function getStatus() {
+	function getStatus(): int {
 		return $this->response->getStatus();
 	}
 }
