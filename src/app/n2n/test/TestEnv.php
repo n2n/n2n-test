@@ -19,13 +19,12 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
+
 namespace n2n\test;
 
 use n2n\core\container\N2nContext;
 use n2n\core\N2N;
 use n2n\core\container\impl\AppN2nContext;
-use n2n\util\cache\impl\EphemeralCacheStore;
-use n2n\context\config\SimpleLookupSession;
 use n2n\core\cache\AppCache;
 use n2n\core\container\Transaction;
 use ReflectionClass;
@@ -123,5 +122,9 @@ class TestEnv {
 
 	public static function temUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): OrmTestEmUtil {
 		return self::orm($n2nContext)->emUtil(true, $persistenceUnitName);
+	}
+
+	public static function pdoUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): DbTestPdoUtil {
+		return self::db($n2nContext)->pdoUtil($persistenceUnitName);
 	}
 }

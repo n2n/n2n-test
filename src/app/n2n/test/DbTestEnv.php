@@ -25,12 +25,13 @@ namespace n2n\test;
 use n2n\core\container\N2nContext;
 use n2n\persistence\ext\PdoPool;
 use n2n\util\type\CastUtils;
+use n2n\persistence\Pdo;
 
 class DbTestEnv {
 	/**
 	 * @var N2nContext
 	 */
-	private $n2nContext;
+	private N2nContext $n2nContext;
 	
 	/**
 	 * @param N2nContext $n2nContext
@@ -38,12 +39,12 @@ class DbTestEnv {
 	public function __construct(N2nContext $n2nContext) {
 		$this->n2nContext = $n2nContext;
 	}
-	
+
 	/**
-	 * @param string $persistenceUnitName
-	 * @return \n2n\persistence\Pdo
+	 * @param string|null $persistenceUnitName
+	 * @return Pdo
 	 */
-	public function pdo(string $persistenceUnitName = null) {
+	public function pdo(string $persistenceUnitName = null): Pdo {
 		$pdoPool = $this->n2nContext->lookup(PdoPool::class);
 		CastUtils::assertTrue($pdoPool instanceof PdoPool);
 		
@@ -75,5 +76,9 @@ class DbTestEnv {
 		}
 
 		return $this;
+	}
+
+	public function pdoUtil(string $persistenceUnitName = null): DbTestPdoUtil {
+		return new DbTestPdoUtil(self::pdo($persistenceUnitName));
 	}
 }

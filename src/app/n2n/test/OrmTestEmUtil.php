@@ -6,10 +6,8 @@ use n2n\persistence\orm\EntityManager;
 use ReflectionClass;
 
 class OrmTestEmUtil {
-	private EntityManager $em;
 
-	public function __construct(EntityManager $em) {
-		$this->em = $em;
+	public function __construct(private EntityManager $em) {
 	}
 
 	public function count(string|ReflectionClass $class, array $matches = []): int {

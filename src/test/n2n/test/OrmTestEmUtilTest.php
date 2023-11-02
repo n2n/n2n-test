@@ -27,7 +27,7 @@ class OrmTestEmUtilTest extends TestCase {
 		TestEnv::temUtil();
 	}
 
-	function testOrmTestTemUtil() {
+	function testOrmTestTemUtilCount() {
 		//transactionalEntityManager
 		$this->insertDummyObjectToDb('value');
 		$tx = TestEnv::createTransaction(true);
@@ -35,13 +35,13 @@ class OrmTestEmUtilTest extends TestCase {
 		$tx->commit();
 	}
 
-	function testOrmTestEmUtil() {
+	function testOrmTestEmUtilCount() {
 		//EntityManager
 		$this->insertDummyObjectToDb('value');
 		$this->assertEquals(1, TestEnv::emUtil()->count(N2nTestDummyObject::class));
 	}
 
-	function testOrmTestEmUtilSearch() {
+	function testOrmTestEmUtilCountSearchMatches() {
 		//EntityManager
 		$this->insertDummyObjectToDb('Anton');
 		$this->insertDummyObjectToDb('Sophie');
@@ -50,6 +50,7 @@ class OrmTestEmUtilTest extends TestCase {
 
 		$this->assertEquals(2, TestEnv::emUtil()->count(N2nTestDummyObject::class, ['dummyString' => 'Sophie']));
 		$this->assertEquals(1, TestEnv::emUtil()->count(N2nTestDummyObject::class, ['dummyString' => 'Otto']));
+		$this->assertEquals(0, TestEnv::emUtil()->count(N2nTestDummyObject::class, ['dummyString' => 'Charlie']));
 
 		//this is what we have inside DB
 		$this->assertEquals(4, TestEnv::emUtil()->count(N2nTestDummyObject::class));
