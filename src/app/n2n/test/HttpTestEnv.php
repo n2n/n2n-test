@@ -78,7 +78,7 @@ class HttpTestEnv {
 		$appConfig = N2N::getAppConfig();
 
 		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager(),
-				new ResponseCacheVerifying());
+				new ResponseCacheVerifying($appN2nContext));
 		$payloadCacheStore = new PayloadCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
 		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
 				$appN2nContext, $responseCacheStore, null);
