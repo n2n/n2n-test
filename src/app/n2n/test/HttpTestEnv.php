@@ -40,11 +40,12 @@ use n2n\reflection\magic\MagicMethodInvoker;
 use n2n\util\ex\IllegalStateException;
 use n2n\web\ext\HttpContextFactory;
 use n2n\web\ext\HttpAddonContext;
-use n2n\web\http\ResponseCacheStore;
+use n2n\web\http\cache\ResponseCacheStore;
 use n2n\web\http\payload\Payload;
 use n2n\web\http\cache\PayloadCacheStore;
 use n2n\web\http\FlushMode;
 use n2n\util\ex\UnsupportedOperationException;
+use n2n\web\http\cache\ResponseCacheVerifying;
 
 class HttpTestEnv {
 
@@ -76,7 +77,8 @@ class HttpTestEnv {
 		$appN2nContext = TestEnv::forkN2nContext();
 		$appConfig = N2N::getAppConfig();
 
-		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
+		$responseCacheStore = new ResponseCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager(),
+				new ResponseCacheVerifying());
 		$payloadCacheStore = new PayloadCacheStore($appN2nContext->getAppCache(), $appN2nContext->getTransactionManager());
 		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
 				$appN2nContext, $responseCacheStore, null);
