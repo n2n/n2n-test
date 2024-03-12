@@ -138,11 +138,10 @@ class TestRequest {
 	/**
 	 * @param \Closure $closure
 	 * @return $this
-	 * @throws \ReflectionException
 	 */
 	function inject(\Closure $closure): static {
 		$invoker = new MagicMethodInvoker($this->httpContext->getN2nContext());
-		$invoker->invoke(null, new \ReflectionFunction($closure));
+		$invoker->invoke(null, IllegalStateException::try(fn () => new \ReflectionFunction($closure)));
 		return $this;
 	}
 
