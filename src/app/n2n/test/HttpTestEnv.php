@@ -46,6 +46,7 @@ use n2n\web\http\cache\PayloadCacheStore;
 use n2n\web\http\FlushMode;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\web\http\cache\ResponseCacheVerifying;
+use n2n\web\http\StatusException;
 
 class HttpTestEnv {
 
@@ -250,6 +251,7 @@ class TestRequest {
 
 	/**
 	 * @return TestResponse
+	 * @throws StatusException
 	 */
 	function exec(bool $sendStatusView = false) {
 		if ($this->httpContext->getN2nContext()->getTransactionManager()->hasOpenTransaction()) {
@@ -264,7 +266,17 @@ class TestRequest {
 		$controllingPlan = $controllerRegistry
 				->createControllingPlan($this->httpContext, $this->simpleRequest->getCmdPath(),
 						$this->httpContext->getActiveSubsystemRule());
-		$result = $controllingPlan->execute();
+
+		try {
+			$result = $controllingPlan->execute();
+		} catch (\Throwable $t) {
+			// phpunit can't handle other open obs than its own. if this changes at some time in the future, remove the
+			// try/catch sourrounding.
+			$response = $this->httpContext->getResponse();
+			$response->flush(FlushMode::SILENT);
+			$response->closeBuffer();
+			throw $t;
+		}
 
 		if (!$result->isSuccessful()) {
 			if (!$sendStatusView) {
