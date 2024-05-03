@@ -3,10 +3,10 @@
 namespace n2n\test;
 
 use n2n\persistence\Pdo;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryComparator;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\util\type\ArgUtils;
 use n2n\util\type\TypeConstraints;
 

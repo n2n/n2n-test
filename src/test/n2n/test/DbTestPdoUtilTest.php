@@ -3,9 +3,9 @@
 namespace n2n\test;
 
 use PHPUnit\Framework\TestCase;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryConstant;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryConstant;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 
 class DbTestPdoUtilTest extends TestCase {
 	function setUp(): void {
