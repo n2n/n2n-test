@@ -184,6 +184,15 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertNotNull($dbSelect[0]['id']);
 	}
 
+	function testSelectDefaultNull() {
+		$dbSelect = TestEnv::pdoUtil()->select('n2n_test_tbl');
+		$this->assertCount(6, $dbSelect);
+		$this->assertCount(3, $dbSelect[0]);
+		$this->assertEquals('aGoodName', $dbSelect[0]['value_name']);
+		$this->assertEquals('initial', $dbSelect[0]['value_status']);
+		$this->assertNotNull($dbSelect[0]['id']);
+	}
+
 	function testSelectValueMultipleMatches() {
 		//check and count with single matches
 		$dbSelect = TestEnv::pdoUtil()->select('n2n_test_tbl',

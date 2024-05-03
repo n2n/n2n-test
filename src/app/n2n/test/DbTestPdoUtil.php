@@ -37,7 +37,7 @@ class DbTestPdoUtil {
 		return $this;
 	}
 
-	public function select(string $tableName, ?array $selectColumnNames, array $whereMatches = []): array {
+	public function select(string $tableName, ?array $selectColumnNames = null, array $whereMatches = []): array {
 		ArgUtils::valArray($selectColumnNames, 'string', true);
 		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 
