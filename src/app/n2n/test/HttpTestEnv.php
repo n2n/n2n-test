@@ -32,7 +32,7 @@ use n2n\core\container\impl\AppN2nContext;
 use n2n\web\http\Response;
 use n2n\util\StringUtils;
 use n2n\core\container\N2nContext;
-use n2n\web\http\SimpleSession;
+use n2n\web\http\impl\SimpleSession;
 use n2n\web\http\UploadDefinition;
 use n2n\util\io\fs\FsPath;
 use n2n\util\io\IoUtils;
