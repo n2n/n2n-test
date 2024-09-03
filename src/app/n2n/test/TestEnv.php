@@ -64,7 +64,7 @@ class TestEnv {
 	}
 
 	static function getAppCache(): AppCache {
-		return N2N::getN2nApplication()->getAppCache();
+		return N2N::getN2nContext()->getAppCache();
 	}
 
 	public static function container(N2nContext $n2nContext = null): ContainerTestEnv {
