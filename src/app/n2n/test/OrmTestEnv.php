@@ -47,7 +47,7 @@ class OrmTestEnv {
 	 * Alias for
 	 * @see OrmTestEnv::getEntityManager()
 	 */
-	public function em(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
+	public function em(bool $transactional = false, ?string $persistenceUnitName = null): EntityManager {
 		return $this->getEntityManager($transactional, $persistenceUnitName);
 	}
 
@@ -56,7 +56,7 @@ class OrmTestEnv {
 	 * @param string|null $persistenceUnitName
 	 * @return EntityManager
 	 */
-	public function getEntityManager(bool $transactional = false, string $persistenceUnitName = null): EntityManager {
+	public function getEntityManager(bool $transactional = false, ?string $persistenceUnitName = null): EntityManager {
 		$emf = $this->getEntityManagerFactory($persistenceUnitName);
 
 		return $transactional ? $emf->getTransactional() : $emf->getExtended();
@@ -66,7 +66,7 @@ class OrmTestEnv {
 	 * Alias for
 	 * @see self::getEntityManagerFactory()
 	 */
-	public function emf(string $persistenceUnitName = null): EntityManagerFactory {
+	public function emf(?string $persistenceUnitName = null): EntityManagerFactory {
 		return $this->getEntityManagerFactory($persistenceUnitName);
 	}
 
@@ -74,14 +74,14 @@ class OrmTestEnv {
 	 * @param string|null $persistenceUnitName
 	 * @return EntityManagerFactory
 	 */
-	public function getEntityManagerFactory(string $persistenceUnitName = null): EntityManagerFactory {
+	public function getEntityManagerFactory(?string $persistenceUnitName = null): EntityManagerFactory {
 		$pdoPool = $this->n2nContext->lookup(EmPool::class);
 		CastUtils::assertTrue($pdoPool instanceof EmPool);
 
 		return $pdoPool->getEntityManagerFactory($persistenceUnitName);
 	}
 
-	public function emUtil(bool $transactional = false, string $persistenceUnitName = null): OrmTestEmUtil {
+	public function emUtil(bool $transactional = false, ?string $persistenceUnitName = null): OrmTestEmUtil {
 		return new OrmTestEmUtil(self::getEntityManager($transactional, $persistenceUnitName));
 	}
 }

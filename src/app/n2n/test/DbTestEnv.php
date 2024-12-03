@@ -44,7 +44,7 @@ class DbTestEnv {
 	 * @param string|null $persistenceUnitName
 	 * @return Pdo
 	 */
-	public function pdo(string $persistenceUnitName = null): Pdo {
+	public function pdo(?string $persistenceUnitName = null): Pdo {
 		$pdoPool = $this->n2nContext->lookup(PdoPool::class);
 		CastUtils::assertTrue($pdoPool instanceof PdoPool);
 		
@@ -58,7 +58,7 @@ class DbTestEnv {
 	 * @param array|null $metaEntityNames
 	 * @return DbTestEnv
 	 */
-	public function truncate(string $persistenceUnitName = null, array $metaEntityNames = null): static {
+	public function truncate(?string $persistenceUnitName = null, ?array $metaEntityNames = null): static {
 		$pdo = $this->pdo($persistenceUnitName);
 		$metaData = $pdo->getMetaData();
 		$db = $metaData->getDatabase();
@@ -78,7 +78,7 @@ class DbTestEnv {
 		return $this;
 	}
 
-	public function pdoUtil(string $persistenceUnitName = null): DbTestPdoUtil {
+	public function pdoUtil(?string $persistenceUnitName = null): DbTestPdoUtil {
 		return new DbTestPdoUtil(self::pdo($persistenceUnitName));
 	}
 }

@@ -67,7 +67,7 @@ class HttpTestEnv {
 	 * @param Url $contextUrl
 	 * @return TestRequest
 	 */
-	function newRequest($subsystemName = null, Url $contextUrl = null) {
+	function newRequest($subsystemName = null, ?Url $contextUrl = null) {
 		if ($contextUrl === null) {
 			$contextUrl = Url::create('https://www.test-url.ch/');
 		}

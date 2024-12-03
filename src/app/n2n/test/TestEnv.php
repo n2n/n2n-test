@@ -67,23 +67,23 @@ class TestEnv {
 		return N2N::getN2nContext()->getAppCache();
 	}
 
-	public static function container(N2nContext $n2nContext = null): ContainerTestEnv {
+	public static function container(?N2nContext $n2nContext = null): ContainerTestEnv {
 		return new ContainerTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function http(N2nContext $n2nContext = null): HttpTestEnv {
+	public static function http(?N2nContext $n2nContext = null): HttpTestEnv {
 		return new HttpTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function orm(N2nContext $n2nContext = null): OrmTestEnv {
+	public static function orm(?N2nContext $n2nContext = null): OrmTestEnv {
 		return new OrmTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function db(N2nContext $n2nContext = null): DbTestEnv {
+	public static function db(?N2nContext $n2nContext = null): DbTestEnv {
 		return new DbTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function createTransaction(bool $readOnly = false, N2nContext $n2nContext = null): Transaction {
+	public static function createTransaction(bool $readOnly = false, ?N2nContext $n2nContext = null): Transaction {
 		return self::container($n2nContext)->tm()->createTransaction($readOnly);
 	}
 
@@ -93,7 +93,7 @@ class TestEnv {
 	 * @param class-string<T>|ReflectionClass $id
 	 * @return T|mixed
 	 */
-	public static function lookup(string|ReflectionClass $id, N2nContext $n2nContext = null): mixed {
+	public static function lookup(string|ReflectionClass $id, ?N2nContext $n2nContext = null): mixed {
 		return self::container($n2nContext)->lookup($id);
 	}
 
@@ -103,28 +103,28 @@ class TestEnv {
 	 * @param N2nContext|null $n2nContext
 	 * @return void
 	 */
-	static function inject(string $id, object $obj, N2nContext $n2nContext = null): void {
+	static function inject(string $id, object $obj, ?N2nContext $n2nContext = null): void {
 		self::container($n2nContext)->inject($id, $obj);
 	}
 
 
-	public static function em(string $persistenceUnitName = null, N2nContext $n2nContext = null): EntityManager {
+	public static function em(?string $persistenceUnitName = null, ?N2nContext $n2nContext = null): EntityManager {
 		return self::orm($n2nContext)->em(false, $persistenceUnitName);
 	}
 
-	public static function tem(string $persistenceUnitName = null, N2nContext $n2nContext = null): EntityManager {
+	public static function tem(?string $persistenceUnitName = null, ?N2nContext $n2nContext = null): EntityManager {
 		return self::orm($n2nContext)->em(true, $persistenceUnitName);
 	}
 
-	public static function emUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): OrmTestEmUtil {
+	public static function emUtil(?string $persistenceUnitName = null, ?N2nContext $n2nContext = null): OrmTestEmUtil {
 		return self::orm($n2nContext)->emUtil(false, $persistenceUnitName);
 	}
 
-	public static function temUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): OrmTestEmUtil {
+	public static function temUtil(?string $persistenceUnitName = null, ?N2nContext $n2nContext = null): OrmTestEmUtil {
 		return self::orm($n2nContext)->emUtil(true, $persistenceUnitName);
 	}
 
-	public static function pdoUtil(string $persistenceUnitName = null, N2nContext $n2nContext = null): DbTestPdoUtil {
+	public static function pdoUtil(?string $persistenceUnitName = null, ?N2nContext $n2nContext = null): DbTestPdoUtil {
 		return self::db($n2nContext)->pdoUtil($persistenceUnitName);
 	}
 }
