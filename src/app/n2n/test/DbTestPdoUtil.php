@@ -89,6 +89,7 @@ class DbTestPdoUtil {
 	}
 
 	public function delete(string $tableName, array $whereMatches = []): static {
+		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 		$builder = $this->pdo->getMetaData()->createDeleteStatementBuilder();
 		$builder->setTable($tableName);
 		$executeDeleteValues = [];
@@ -103,5 +104,24 @@ class DbTestPdoUtil {
 		$stmt->execute($executeDeleteValues);
 
 		return $this;
+	}
+
+	public function count(string $tableName, array $whereMatches = []): int {
+		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
+		$builder = $this->pdo->getMetaData()->createSelectStatementBuilder();
+		$builder->addFrom(new QueryTable($tableName));
+		$executeCountValues = [];
+
+		foreach ($whereMatches as $columnName => $value) {
+			$builder->getWhereComparator()->match(new QueryColumn($columnName),
+					($value === null ? QueryComparator::OPERATOR_IS : QueryComparator::OPERATOR_EQUAL),
+					new QueryPlaceMarker());
+			$executeCountValues[] = $value;
+		}
+
+		$stmt = $this->pdo->prepare($builder->toSqlString());
+		$stmt->execute($executeCountValues);
+
+		return count($stmt->fetchAll(\PDO::FETCH_NUM));
 	}
 }

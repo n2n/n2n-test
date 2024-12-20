@@ -161,7 +161,7 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals(['value_name' => 'aWrongName'],
 				TestEnv::pdoUtil()->select('n2n_test_tbl', ['value_name'], ['value_name' => 'aWrongName'])[0]);
 
-		//we get 4 Rows (2 of 6 Rows has not value_status = initial
+		//we get 4 Rows (2 of 6 Rows has not value_status = initial)
 		$this->assertCount(4, TestEnv::pdoUtil()->select('n2n_test_tbl',
 				['id', 'value_name', 'value_status'], ['value_status' => 'initial']));
 
@@ -262,5 +262,24 @@ class DbTestPdoUtilTest extends TestCase {
 		//count after delete
 		$this->assertCount(1, TestEnv::pdoUtil()->select('n2n_test_tbl',
 				['id', 'value_name', 'value_status']));
+	}
+
+
+	function testCount() {
+		$this->assertEquals(6, TestEnv::pdoUtil()->count('n2n_test_tbl'));
+	}
+
+	function testCountValuesMatchedByValue() {
+		//value that is unique
+		$this->assertEquals(1, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_name' => 'aWrongName']));
+		//value that is here twice
+		$this->assertEquals(2, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_name' => 'aNewName']));
+		//value refined by multiple where will give a single result
+		$this->assertEquals(1, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_name' => 'aNewName', 'value_status' => 'new']));
+		//other where criteria, we get 4 Rows (2 of 6 Rows has not value_status = initial)
+		$this->assertEquals(4, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'initial']));
+
+		$this->assertEquals(count($this->selectTempDataFromDb('value_status', 'initial')),
+				TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'initial']));
 	}
 }
