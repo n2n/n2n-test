@@ -9,6 +9,8 @@ use n2n\persistence\meta\data\QueryComparator;
 use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\util\type\ArgUtils;
 use n2n\util\type\TypeConstraints;
+use n2n\spec\dbo\meta\data\impl\QueryFunction;
+use n2n\spec\dbo\meta\data\impl\QueryConstant;
 
 class DbTestPdoUtil {
 	public function __construct(private Pdo $pdo) {
@@ -109,6 +111,7 @@ class DbTestPdoUtil {
 	public function count(string $tableName, array $whereMatches = []): int {
 		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 		$builder = $this->pdo->getMetaData()->createSelectStatementBuilder();
+		$builder->addSelectColumn(new QueryFunction(QueryFunction::COUNT, new QueryConstant(1)));
 		$builder->addFrom(new QueryTable($tableName));
 		$executeCountValues = [];
 
@@ -121,7 +124,8 @@ class DbTestPdoUtil {
 
 		$stmt = $this->pdo->prepare($builder->toSqlString());
 		$stmt->execute($executeCountValues);
+		$arr = $stmt->fetch(\PDO::FETCH_NUM);
 
-		return count($stmt->fetchAll(\PDO::FETCH_NUM));
+		return array_shift($arr);
 	}
 }

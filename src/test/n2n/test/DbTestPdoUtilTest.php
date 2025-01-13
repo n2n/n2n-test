@@ -282,4 +282,8 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals(count($this->selectTempDataFromDb('value_status', 'initial')),
 				TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'initial']));
 	}
+
+	function testCountNoMatchingValue() {
+		$this->assertEquals(0, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'blubb']));
+	}
 }
