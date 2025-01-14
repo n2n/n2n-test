@@ -11,11 +11,16 @@ use n2n\util\type\ArgUtils;
 use n2n\util\type\TypeConstraints;
 use n2n\spec\dbo\meta\data\impl\QueryFunction;
 use n2n\spec\dbo\meta\data\impl\QueryConstant;
+use n2n\spec\dbo\meta\data\ComparisonBuilder;
+use n2n\spec\dbo\err\DboException;
 
 class DbTestPdoUtil {
 	public function __construct(private Pdo $pdo) {
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	public function update(string $tableName, array $setMap, array $whereMatches = []): static {
 		$builder = $this->pdo->getMetaData()->createUpdateStatementBuilder();
 		$builder->setTable($tableName);
@@ -26,12 +31,7 @@ class DbTestPdoUtil {
 			$executeReplacementValues[] = $value;
 		}
 
-		foreach ($whereMatches as $columnName => $value) {
-			$builder->getWhereComparator()->match(new QueryColumn($columnName),
-					($value === null ? QueryComparator::OPERATOR_IS : QueryComparator::OPERATOR_EQUAL),
-					new QueryPlaceMarker());
-			$executeReplacementValues[] = $value;
-		}
+		array_push($executeReplacementValues, ...$this->where($builder->getWhereComparator(), $whereMatches));
 
 		$stmt = $this->pdo->prepare($builder->toSqlString());
 		$stmt->execute($executeReplacementValues);
@@ -39,24 +39,21 @@ class DbTestPdoUtil {
 		return $this;
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	public function select(string $tableName, ?array $selectColumnNames = null, array $whereMatches = []): array {
 		ArgUtils::valArray($selectColumnNames, 'string', true);
 		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 
 		$builder = $this->pdo->getMetaData()->createSelectStatementBuilder();
 		$builder->addFrom(new QueryTable($tableName));
-		$executeSelectValues = [];
 
 		foreach ((array) $selectColumnNames as $queryColumn) {
 			$builder->addSelectColumn(new QueryColumn($queryColumn));
 		}
 
-		foreach ($whereMatches as $columnName => $value) {
-			$builder->getWhereComparator()->match(new QueryColumn($columnName),
-					($value === null ? QueryComparator::OPERATOR_IS : QueryComparator::OPERATOR_EQUAL),
-					new QueryPlaceMarker());
-			$executeSelectValues[] = $value;
-		}
+		$executeSelectValues = $this->where($builder->getWhereComparator(), $whereMatches);
 
 		$stmt = $this->pdo->prepare($builder->toSqlString());
 		$stmt->execute($executeSelectValues);
@@ -64,6 +61,9 @@ class DbTestPdoUtil {
 		return ($stmt->fetchAll(\PDO::FETCH_ASSOC));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	public function insert(string $tableName, array $firstValuesMap, array $additionalValuesRows = []): static {
 		ArgUtils::valArray($firstValuesMap, 'scalar');
 		ArgUtils::valType($additionalValuesRows, TypeConstraints::array(false, TypeConstraints::array('scalar')));
@@ -90,17 +90,14 @@ class DbTestPdoUtil {
 		return $this;
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	public function delete(string $tableName, array $whereMatches = []): static {
 		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 		$builder = $this->pdo->getMetaData()->createDeleteStatementBuilder();
 		$builder->setTable($tableName);
-		$executeDeleteValues = [];
-		foreach ($whereMatches as $columnName => $value) {
-			$builder->getWhereComparator()->match(new QueryColumn($columnName),
-					($value === null ? QueryComparator::OPERATOR_IS : QueryComparator::OPERATOR_EQUAL),
-					new QueryPlaceMarker());
-			$executeDeleteValues[] = $value;
-		}
+		$executeDeleteValues = $this->where($builder->getWhereComparator(), $whereMatches);
 
 		$stmt = $this->pdo->prepare($builder->toSqlString());
 		$stmt->execute($executeDeleteValues);
@@ -108,24 +105,31 @@ class DbTestPdoUtil {
 		return $this;
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	public function count(string $tableName, array $whereMatches = []): int {
 		ArgUtils::valArray($whereMatches, ['scalar', 'null'], true);
 		$builder = $this->pdo->getMetaData()->createSelectStatementBuilder();
 		$builder->addSelectColumn(new QueryFunction(QueryFunction::COUNT, new QueryConstant(1)));
 		$builder->addFrom(new QueryTable($tableName));
-		$executeCountValues = [];
-
-		foreach ($whereMatches as $columnName => $value) {
-			$builder->getWhereComparator()->match(new QueryColumn($columnName),
-					($value === null ? QueryComparator::OPERATOR_IS : QueryComparator::OPERATOR_EQUAL),
-					new QueryPlaceMarker());
-			$executeCountValues[] = $value;
-		}
+		$executeCountValues = $this->where($builder->getWhereComparator(), $whereMatches);
 
 		$stmt = $this->pdo->prepare($builder->toSqlString());
 		$stmt->execute($executeCountValues);
 		$arr = $stmt->fetch(\PDO::FETCH_NUM);
 
-		return array_shift($arr);
+		return current($arr);
+	}
+
+	private function where(ComparisonBuilder $comparisonBuilder, array $whereMatches): array {
+		$placeholderValues = [];
+		foreach ($whereMatches as $columnName => $value) {
+			$comparisonBuilder->match(new QueryColumn($columnName),
+					($value === null ? ComparisonBuilder::OPERATOR_IS : ComparisonBuilder::OPERATOR_EQUAL),
+					new QueryPlaceMarker());
+			$placeholderValues[] = $value;
+		}
+		return $placeholderValues;
 	}
 }
