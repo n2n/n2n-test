@@ -47,6 +47,8 @@ use n2n\web\http\FlushMode;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\web\http\cache\ResponseCacheVerifying;
 use n2n\web\http\StatusException;
+use n2n\core\config\WebConfig;
+use n2n\core\config\RoutingConfig;
 
 class HttpTestEnv {
 
@@ -67,7 +69,7 @@ class HttpTestEnv {
 	 * @param Url $contextUrl
 	 * @return TestRequest
 	 */
-	function newRequest($subsystemName = null, ?Url $contextUrl = null) {
+	function newRequest($subsystemName = null, ?Url $contextUrl = null, RoutingConfig $routingConfig = null): TestRequest {
 		if ($contextUrl === null) {
 			$contextUrl = Url::create('https://www.test-url.ch/');
 		}
@@ -84,7 +86,7 @@ class HttpTestEnv {
 		$httpContext = HttpContextFactory::createFromAppConfig($appConfig, $request, new SimpleSession(),
 				$appN2nContext, $responseCacheStore, null);
 
-		$controllerRegistry = new ControllerRegistry($appConfig->web(), $appConfig->routing());
+		$controllerRegistry = new ControllerRegistry($appConfig->web(), $routingConfig ?? $appConfig->routing());
 		$controllerInvoker = new HttpAddonContext($httpContext, $controllerRegistry, $responseCacheStore, $payloadCacheStore);
 
 		// TODO: think of some better way.
