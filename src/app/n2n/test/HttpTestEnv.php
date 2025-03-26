@@ -49,6 +49,7 @@ use n2n\web\http\cache\ResponseCacheVerifying;
 use n2n\web\http\StatusException;
 use n2n\core\config\WebConfig;
 use n2n\core\config\RoutingConfig;
+use n2n\util\io\ob\OutputBuffer;
 
 class HttpTestEnv {
 
@@ -355,5 +356,13 @@ class TestResponse {
 	 */
 	function getStatus(): int {
 		return $this->response->getStatus();
+	}
+
+	function captureResponseOut(): string {
+		$ob = new OutputBuffer();
+		$ob->start();
+		$this->getSentPayload()->responseOut();
+		$ob->end();
+		return $ob->getBufferedContents();
 	}
 }
