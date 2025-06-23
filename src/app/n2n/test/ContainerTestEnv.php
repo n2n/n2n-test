@@ -29,7 +29,7 @@ class ContainerTestEnv {
 	/**
 	 * @var N2nContext
 	 */
-	private $n2nContext;
+	private N2nContext $n2nContext;
 	
 	/**
 	 * @param N2nContext $n2nContext

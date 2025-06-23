@@ -66,7 +66,8 @@ class DbTestPdoUtil {
 	 */
 	public function insert(string $tableName, array $firstValuesMap, array $additionalValuesRows = []): static {
 		ArgUtils::valArray($firstValuesMap, 'scalar');
-		ArgUtils::valType($additionalValuesRows, TypeConstraints::array(false, TypeConstraints::array('scalar')));
+		ArgUtils::valType($additionalValuesRows, TypeConstraints::array(false,
+				TypeConstraints::array(false, TypeConstraints::namedType('scalar', true))));
 
 		$builder = $this->pdo->getMetaData()->createInsertStatementBuilder();
 		$builder->setTable($tableName);
