@@ -65,7 +65,7 @@ class DbTestPdoUtil {
 	 * @throws DboException
 	 */
 	public function insert(string $tableName, array $firstValuesMap, array $additionalValuesRows = []): static {
-		ArgUtils::valArray($firstValuesMap, 'scalar');
+		ArgUtils::valArray($firstValuesMap, ['scalar', 'null']);
 		ArgUtils::valType($additionalValuesRows, TypeConstraints::array(false,
 				TypeConstraints::array(false, TypeConstraints::namedType('scalar', true))));
 
