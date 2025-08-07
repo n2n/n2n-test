@@ -72,4 +72,9 @@ class ContainerTestEnv {
 		$this->n2nContext->putLookupInjection($id, $obj);
 		return $this;
 	}
+
+	function init(object $obj): static {
+		$this->n2nContext->getLookupManager()->init($obj);
+		return $this;
+	}
 }
