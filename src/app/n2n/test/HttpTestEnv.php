@@ -341,13 +341,10 @@ class TestResponse {
 	 * @return bool
 	 */
 	function isBufferable(): bool {
-		return $this->response->getSentPayload()->isBufferable();
+		return $this->response->getSentPayload()?->isBufferable() ?? false;
 	}
 
-	/**
-	 * @return Payload
-	 */
-	function getSentPayload(): Payload {
+	function getSentPayload(): ?Payload {
 		return $this->response->getSentPayload();
 	}
 
