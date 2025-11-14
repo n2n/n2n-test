@@ -75,6 +75,10 @@ class TestEnv {
 		return new HttpTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
+	public static function batch(?N2nContext $n2nContext = null): BatchTestEnv {
+		return new BatchTestEnv($n2nContext ?? self::getN2nContext());
+	}
+
 	public static function orm(?N2nContext $n2nContext = null): OrmTestEnv {
 		return new OrmTestEnv($n2nContext ?? self::getN2nContext());
 	}

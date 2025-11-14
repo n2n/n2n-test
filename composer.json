@@ -32,6 +32,7 @@
 		"phpunit/phpunit" : "^9.6.11",
         "n2n/n2n": "~7.5.0",
         "n2n/n2n-web": "~7.5.0",
+        "n2n/n2n-batch": "~7.5.0",
         "n2n/n2n-persistence": "~7.5.0",
         "n2n/n2n-impl-persistence-meta": "~7.5.0",
         "n2n/n2n-impl-persistence-orm": "~7.5.0"

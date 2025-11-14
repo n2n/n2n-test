@@ -4,6 +4,7 @@ use n2n\core\cache\impl\FileN2nCache;
 use n2n\core\N2N;
 use n2n\core\TypeLoader;
 use n2n\io\IoUtils;
+use n2n\persistence\ext\PdoPool;
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -24,7 +25,8 @@ TypeLoader::register(true,
 		require __DIR__ . '/../vendor/composer/autoload_psr4.php',
 		require __DIR__ . '/../vendor/composer/autoload_classmap.php');
 
-N2N::initialize($pubPath, $varPath, new FileN2nCache());
+N2N::initialize($pubPath, $varPath, n2nCache: \n2n\core\cache\impl\N2nCaches::ephemeral(),
+		enableExceptionHandler: false);
 
 $testSqlFsPath = N2N::getVarStore()->requestFileFsPath('bak', null, null, 'backup.sql', false, false, false);
 
@@ -43,4 +45,4 @@ $sql = preg_replace("/, ?(\n^\);$)/m", "$1", $sql);
 $sql = str_replace(['UNSIGNED ', 'unsigned '], '', $sql);
 //file_put_contents('huii.sql', $sql);
 
-N2N::getPdoPool()->getPdo()->exec($sql);
+N2N::getN2nContext()->lookup(PdoPool::class)->getPdo()->exec($sql);
