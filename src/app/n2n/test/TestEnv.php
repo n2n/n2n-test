@@ -87,8 +87,9 @@ class TestEnv {
 		return new DbTestEnv($n2nContext ?? self::getN2nContext());
 	}
 
-	public static function createTransaction(bool $readOnly = false, ?N2nContext $n2nContext = null): Transaction {
-		return self::container($n2nContext)->tm()->createTransaction($readOnly);
+	public static function createTransaction(bool $readOnly = false, ?N2nContext $n2nContext = null,
+			bool $nestedTransactionAllowed = false): Transaction {
+		return self::container($n2nContext)->tm()->createTransaction($readOnly, $nestedTransactionAllowed);
 	}
 
 
