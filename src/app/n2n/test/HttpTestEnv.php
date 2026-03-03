@@ -50,6 +50,7 @@ use n2n\web\http\StatusException;
 use n2n\core\config\WebConfig;
 use n2n\core\config\RoutingConfig;
 use n2n\util\io\ob\OutputBuffer;
+use n2n\web\http\controller\SpecialViewRenderer;
 
 class HttpTestEnv {
 
@@ -283,7 +284,7 @@ class TestRequest {
 				throw $result->getStatusException();
 			}
 
-			$controllingPlan->sendStatusView($result->getStatusException());
+			(new SpecialViewRenderer($this->httpContext))->sendStatusView($result->getStatusException(), false);
 		}
 
 		$response = $this->httpContext->getResponse();
