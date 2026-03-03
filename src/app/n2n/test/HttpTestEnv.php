@@ -235,11 +235,7 @@ class TestRequest {
 		return $this;
 	}
 
-	/**
-	 * @param array $data
-	 * @return \n2n\test\TestRequest
-	 */
-	function bodyJson(array $data) {
+	function bodyJson(array|\JsonSerializable $data): static {
 		return $this->body(StringUtils::jsonEncode($data));
 	}
 
