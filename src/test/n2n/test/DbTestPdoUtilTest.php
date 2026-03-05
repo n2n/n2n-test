@@ -6,8 +6,12 @@ use PHPUnit\Framework\TestCase;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\spec\dbo\meta\data\impl\QueryConstant;
 use n2n\spec\dbo\meta\data\impl\QueryTable;
+use n2n\spec\dbo\err\DboException;
 
 class DbTestPdoUtilTest extends TestCase {
+	/**
+	 * @throws DboException
+	 */
 	function setUp(): void {
 		TestEnv::db()->truncate();
 		$this->insertTempDataToDb('aGoodName');
@@ -18,6 +22,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->insertTempDataToDb('aNewName', 'new');
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	private function insertTempDataToDb(string $valueName, ?string $valueStatus = 'initial'): void {
 		$pdo = TestEnv::db()->pdo();
 		$builder = $pdo->getMetaData()->createInsertStatementBuilder();
@@ -27,6 +34,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$pdo->exec($builder->toSqlString());
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	private function selectTempDataFromDb(string $column, int|string $value, bool $fetchAll = true): mixed {
 		$pdo = TestEnv::db()->pdo();
 		$builder = $pdo->getMetaData()->createSelectStatementBuilder();
@@ -44,6 +54,9 @@ class DbTestPdoUtilTest extends TestCase {
 		return ($stmt->fetchAll(\PDO::FETCH_ASSOC));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testUpdateReplaceValueMatchedById() {
 		//select before use pdoUtil()->update
 		$this->assertEquals('aWrongName', $this->selectTempDataFromDb('id', 2)[0]['value_name']);
@@ -61,6 +74,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals(1, $this->selectTempDataFromDb('id', 1)[0]['id']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testUpdateReplaceValueMatchedByValue() {
 		//select before use pdoUtil()->update
 		$this->assertEquals('aWrongName', $this->selectTempDataFromDb('value_name', 'aWrongName')[0]['value_name']);
@@ -80,6 +96,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals('aGoodName', $this->selectTempDataFromDb('value_name', 'aGoodName')[0]['value_name']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testUpdateReplaceValuesEmptyMatches() {
 		//select before use pdoUtil()->update
 		$this->assertEquals('aWrongName', $this->selectTempDataFromDb('value_name', 'aWrongName')[0]['value_name']);
@@ -100,6 +119,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEmpty($this->selectTempDataFromDb('value_name', 'aGoodName'));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testUpdateReplaceMultipleValues() {
 		//select before use pdoUtil()->update
 		$dbSelect = $this->selectTempDataFromDb('value_name', 'aWrongName');
@@ -120,6 +142,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals($idBefore, $idAfter);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testUpdateReplaceMultipleMatches() {
 		//select before use pdoUtil()->update
 		$dbSelect = $this->selectTempDataFromDb('value_name', 'aNewName');
@@ -140,6 +165,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals('new', $dbSelectNew[0]['value_status']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testReplaceNullValue() {
 		TestEnv::pdoUtil()->update('n2n_test_tbl',
 				['value_name' => null], ['value_name' => 'aNewName']);
@@ -152,6 +180,9 @@ class DbTestPdoUtilTest extends TestCase {
 				['id', 'value_name', 'value_status'], ['value_name' => 'aExNullName'])[0]['value_name']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testSelectValueMatchedByValue() {
 		$pdoUtilSelect = TestEnv::pdoUtil()->select('n2n_test_tbl',
 				['id', 'value_name', 'value_status'], ['value_name' => 'aWrongName']);
@@ -174,6 +205,9 @@ class DbTestPdoUtilTest extends TestCase {
 				TestEnv::pdoUtil()->select('n2n_test_tbl', ['id', 'value_name', 'value_status'], ['value_status' => 'initial']));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testSelectNull() {
 		$dbSelect = TestEnv::pdoUtil()->select('n2n_test_tbl',
 				null);
@@ -184,6 +218,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertNotNull($dbSelect[0]['id']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testSelectDefaultNull() {
 		$dbSelect = TestEnv::pdoUtil()->select('n2n_test_tbl');
 		$this->assertCount(6, $dbSelect);
@@ -193,6 +230,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertNotNull($dbSelect[0]['id']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testSelectValueMultipleMatches() {
 		//check and count with single matches
 		$dbSelect = TestEnv::pdoUtil()->select('n2n_test_tbl',
@@ -211,6 +251,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertEquals('new', $dbSelectSpecific[0]['value_status']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testInsertValue() {
 		//count before
 		$this->assertCount(6, TestEnv::pdoUtil()->select('n2n_test_tbl',
@@ -228,6 +271,9 @@ class DbTestPdoUtilTest extends TestCase {
 				['id', 'value_name', 'value_status'], ['value_status' => 'additionalInsert']));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testInsertTestDefaultAndAutoValue() {
 		//count before
 		$this->assertCount(6, TestEnv::pdoUtil()->select('n2n_test_tbl',
@@ -246,6 +292,9 @@ class DbTestPdoUtilTest extends TestCase {
 		$this->assertNotNull($dbSelect[0]['id']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testDeleteValue() {
 		//count before
 		$this->assertCount(6, TestEnv::pdoUtil()->select('n2n_test_tbl',
@@ -265,10 +314,16 @@ class DbTestPdoUtilTest extends TestCase {
 	}
 
 
+	/**
+	 * @throws DboException
+	 */
 	function testCount() {
 		$this->assertEquals(6, TestEnv::pdoUtil()->count('n2n_test_tbl'));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testCountValuesMatchedByValue() {
 		//value that is unique
 		$this->assertEquals(1, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_name' => 'aWrongName']));
@@ -283,6 +338,9 @@ class DbTestPdoUtilTest extends TestCase {
 				TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'initial']));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testCountNoMatchingValue() {
 		$this->assertEquals(0, TestEnv::pdoUtil()->count('n2n_test_tbl', ['value_status' => 'blubb']));
 	}

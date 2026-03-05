@@ -3,11 +3,6 @@
 namespace n2n\test;
 
 use PHPUnit\Framework\TestCase;
-use n2n\spec\dbo\meta\data\impl\QueryColumn;
-use n2n\spec\dbo\meta\data\impl\QueryConstant;
-use n2n\test\bo\N2nTestDummyObject;
-use n2n\util\ex\IllegalStateException;
-use n2n\core\N2N;
 use n2n\util\DateUtils;
 
 class BatchTestEnvTest extends TestCase {

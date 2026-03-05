@@ -13,6 +13,7 @@ use n2n\reflection\property\UnknownPropertyException;
 use n2n\reflection\property\InvalidPropertyAccessMethodException;
 use n2n\reflection\property\PropertyAccessException;
 use n2n\persistence\orm\CorruptedDataException;
+use n2n\spec\dbo\err\DboException;
 
 class OrmTestEmUtilTest extends TestCase {
 	function setUp(): void {
@@ -24,6 +25,9 @@ class OrmTestEmUtilTest extends TestCase {
 		TestEnv::db()->truncate();
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	private function insertDummyObjectToDb(string $dummyString): void {
 		$pdo = TestEnv::db()->pdo();
 		$builder = $pdo->getMetaData()->createInsertStatementBuilder();
@@ -38,6 +42,9 @@ class OrmTestEmUtilTest extends TestCase {
 		TestEnv::temUtil();
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestTemUtilCount() {
 		//transactionalEntityManager
 		$this->insertDummyObjectToDb('value');
@@ -46,12 +53,18 @@ class OrmTestEmUtilTest extends TestCase {
 		$tx->commit();
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestEmUtilCount() {
 		//EntityManager
 		$this->insertDummyObjectToDb('value');
 		$this->assertEquals(1, TestEnv::emUtil()->count(N2nTestDummyObject::class));
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestEmUtilCountSearchMatches() {
 		//EntityManager
 		$this->insertDummyObjectToDb('Anton');
@@ -74,6 +87,9 @@ class OrmTestEmUtilTest extends TestCase {
 
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestEmUtilDeleteSearchMatches() {
 		//EntityManager
 		$this->insertDummyObjectToDb('Anton');
@@ -97,12 +113,18 @@ class OrmTestEmUtilTest extends TestCase {
 		$this->assertCount(2, $values);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestEmUtilDeleteExpectBecauseNoTransactionOpen() {
 		$this->expectException(TransactionRequiredException::class);
 		$this->insertDummyObjectToDb('Sophie');
 		TestEnv::emUtil()->delete(N2nTestDummyObject::class, ['dummyString' => 'Sophie']);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testOrmTestEmUtilDeleteExpectBecauseTransactionOpenIsReadonly() {
 		$this->expectException(IllegalStateException::class);
 		$this->insertDummyObjectToDb('Sophie');
@@ -117,6 +139,7 @@ class OrmTestEmUtilTest extends TestCase {
 	 * @throws InvalidPropertyAccessMethodException
 	 * @throws PropertyAccessException
 	 * @throws CorruptedDataException
+	 * @throws DboException
 	 */
 	function testOrmTestEmUtilUpdateSearchMatches() {
 		//EntityManager
@@ -150,6 +173,7 @@ class OrmTestEmUtilTest extends TestCase {
 	 * @throws InvalidPropertyAccessMethodException
 	 * @throws PropertyAccessException
 	 * @throws CorruptedDataException
+	 * @throws DboException
 	 */
 	function testOrmTestEmUtilUpdateExpectBecauseNoTransactionOpen() {
 		$this->expectException(TransactionRequiredException::class);
@@ -163,6 +187,7 @@ class OrmTestEmUtilTest extends TestCase {
 	 * @throws InvalidPropertyAccessMethodException
 	 * @throws PropertyAccessException
 	 * @throws CorruptedDataException
+	 * @throws DboException
 	 */
 	function testOrmTestEmUtilUpdateExpectBecauseTransactionOpenIsReadonly() {
 		$this->expectException(IllegalStateException::class);
