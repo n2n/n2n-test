@@ -50,14 +50,17 @@ class ArrayHasSubset extends Constraint {
 					return false;
 				}
 
-			} else {
-				if ($actualValue !== $expectedValue) {
-					$this->failureReason =
-							'Value mismatch at ' . $currentPath .
-							' (expected ' . var_export($expectedValue, true) .
-							', got ' . var_export($actualValue, true) . ')';
+			} elseif (is_object($actualValue) && is_object($expectedValue)) {
+				if (!(get_class($actualValue) === get_class($expectedValue)
+						&& $this->compareSubset((array) $actualValue, (array) $expectedValue))) {
 					return false;
 				}
+			} elseif ($actualValue !== $expectedValue) {
+				$this->failureReason =
+						'Value mismatch at ' . $currentPath .
+						' (expected ' . var_export($expectedValue, true) .
+						', got ' . var_export($actualValue, true) . ')';
+				return false;
 			}
 		}
 
