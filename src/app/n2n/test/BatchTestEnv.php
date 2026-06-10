@@ -27,24 +27,17 @@ class BatchTestEnv {
 				$lastTriggeredDateTime, [$batchJobClassName], $this->n2nContext));
 	}
 
-	function dispatch(mixed $batchJob): void {
-		$this->n2nBatch()->dispatch($batchJob);
+	function dispatch(object $message): void {
+		$this->n2nBatch()->dispatch($message);
 	}
 
 	/**
 	 * @template T
-	 * @param object $obj
+	 * @param object $message
 	 * @param class-string<T> $expectedReturnTypeName
 	 * @return T
 	 */
-	function dispatchAndReadSingleReturnObj(object $obj, string $expectedReturnTypeName): mixed {
-		$results = $this->n2nBatch()->dispatch($obj);
-
-		if (count($results) !== 1) {
-			throw new TestConstraintFailedException('Dispatch of ' . get_class($obj)
-					. ' returned multiple results: ' . count($results));
-		}
-
-		return $results[0]->readReturnObj($expectedReturnTypeName);
+	function dispatchUnicast(object $message, string $expectedReturnTypeName): mixed {
+		return $this->n2nBatch()->dispatchUnicast($message, $expectedReturnTypeName);
 	}
 }
